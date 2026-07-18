@@ -1,0 +1,1295 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="QUINCY PORTAL - 個人名片入口 | 社群連結、留言板與關於我">
+  <meta property="og:title" content="QUINCY PORTAL - 個人名片入口">
+  <meta property="og:type" content="website">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>QUINCY PORTAL - 個人名片入口</title>
+  
+  <!-- Favicon / App Icons -->
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Lucide Icons CDN -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    /* Custom Scrollbar for list and guestbook */
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 4px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156, 163, 175, 0.3);
+      border-radius: 9999px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(75, 85, 99, 0.4);
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+      background: rgba(156, 163, 175, 0.5);
+    }
+
+    /* ===== Liquid Glass Tabs ===== */
+    #glass-pill {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      left: 0;
+      width: 0;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.92), rgba(255,255,255,0.60));
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border: 1px solid rgba(255,255,255,0.70);
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.10),
+        0 1px 3px rgba(0,0,0,0.06),
+        inset 0 1px 0 rgba(255,255,255,0.95),
+        inset 0 -1px 2px rgba(0,0,0,0.05);
+      transition:
+        left 0.55s cubic-bezier(0.30, 1.60, 0.36, 1),
+        width 0.55s cubic-bezier(0.30, 1.60, 0.36, 1),
+        transform 0.35s ease,
+        background 0.3s ease;
+      will-change: left, width, transform;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .dark #glass-pill {
+      background: linear-gradient(135deg, rgba(255,255,255,0.17), rgba(255,255,255,0.06));
+      border-color: rgba(255,255,255,0.20);
+      box-shadow:
+        0 6px 18px rgba(0,0,0,0.40),
+        inset 0 1px 0 rgba(255,255,255,0.28),
+        inset 0 -1px 2px rgba(0,0,0,0.25);
+    }
+    /* 移動中:液態擠壓變形 */
+    #tab-bar.is-moving #glass-pill {
+      transform: scaleY(0.86) scaleX(1.05);
+    }
+    /* 光澤掃過 */
+    #glass-pill::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,0.55) 50%, transparent 68%);
+      opacity: 0;
+      transform: translateX(-60%);
+    }
+    #tab-bar.is-moving #glass-pill::after {
+      animation: pill-shine 0.55s ease-out;
+    }
+    @keyframes pill-shine {
+      0%   { opacity: 0; transform: translateX(-60%); }
+      45%  { opacity: 0.9; }
+      100% { opacity: 0; transform: translateX(60%); }
+    }
+    /* 內容切換:玻璃霧化淡入 */
+    @keyframes glass-in {
+      from { opacity: 0; filter: blur(12px); transform: translateY(8px) scale(0.985); }
+      to   { opacity: 1; filter: blur(0);    transform: translateY(0)  scale(1); }
+    }
+    .tab-enter {
+      animation: glass-in 0.45s cubic-bezier(0.22, 0.9, 0.3, 1);
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 relative overflow-x-hidden flex flex-col justify-between">
+
+  <!-- Dynamic Ambient Grid Background -->
+  <div class="absolute inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] pointer-events-none"></div>
+
+  <!-- Header Utilities -->
+  <header class="relative max-w-6xl mx-auto w-full px-6 py-4 flex justify-between items-center z-10">
+    <div class="flex items-center gap-1.5 font-mono text-xs text-neutral-400 uppercase tracking-wider font-semibold">
+      <i data-lucide="sparkles" class="text-amber-500 animate-pulse w-3.5 h-3.5"></i>
+      <span>QUINCY PORTAL</span>
+    </div>
+    
+    <div class="flex items-center gap-3">
+      <!-- Settings Trigger -->
+      <button
+        id="settings-toggle-btn"
+        onclick="openSettings()"
+        class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-900 transition-colors text-neutral-500 dark:text-neutral-400"
+        title="編輯網頁連結與資訊"
+      >
+        <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
+      </button>
+
+      <!-- Theme Toggle -->
+      <button
+        id="theme-toggle-btn"
+        onclick="toggleTheme()"
+        class="p-2 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:scale-105 transition-all text-neutral-600 dark:text-neutral-300"
+        aria-label="Toggle Dark Mode"
+      >
+        <i id="theme-icon" data-lucide="sun" class="text-amber-400 w-[18px] h-[18px]"></i>
+      </button>
+    </div>
+  </header>
+
+  <!-- Main Content Card Container -->
+  <main class="relative max-w-4xl mx-auto w-full px-6 py-8 flex-1 flex items-center justify-center z-10">
+    
+    <!-- Toast Alert -->
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-white font-sans text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+      <span id="toast-message">網頁資訊與個人連結已更新！</span>
+    </div>
+
+    <!-- Main visual card board -->
+    <div class="w-full bg-white dark:bg-neutral-900/60 border border-neutral-200/60 dark:border-neutral-850 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 backdrop-blur-md">
+      
+      <!-- LEFT PANEL: Quincy Profile Visual Card -->
+      <div class="md:col-span-5 bg-neutral-50/50 dark:bg-neutral-900/40 p-8 flex flex-col justify-between items-center text-center border-b md:border-b-0 md:border-r border-neutral-200/60 dark:border-neutral-850">
+        
+        <!-- Top Group: Decorator & Logo -->
+        <div class="w-full flex flex-col items-center md:-mt-2">
+          <!-- Top decorative spacing -->
+          <div class="w-full text-left hidden md:block mb-6">
+            <span class="font-mono text-[10px] text-neutral-400 tracking-widest block mb-1">
+              qVsion
+            </span>
+            <div class="h-[2px] w-8 bg-neutral-900 dark:bg-white transition-colors"></div>
+          </div>
+
+          <!-- Logo Silhouette Wrapper -->
+          <div class="my-4 md:my-0 flex flex-col items-center">
+            <div id="logo-container" class="w-52 h-52 md:w-64 md:h-64 flex items-center justify-center">
+              <!-- Default Quincy Silhouette Vector -->
+              <img
+                id="default-logo-img"
+                src="assets/qlogo.png"
+                alt="Quincy Logo"
+                class="w-full h-full object-contain invert dark:invert-0 transition-all duration-300 select-none drop-shadow-sm"
+              />
+            </div>
+            
+            <span id="logo-credit" class="mt-2 font-mono text-xs tracking-widest text-neutral-400 uppercase">
+              LOGO BY QUINCY
+            </span>
+
+            <!-- Nietzsche Quote -->
+            <div class="mt-4 flex flex-col items-center max-w-[320px] px-2 text-center select-none">
+              <p class="font-sans text-xs italic text-neutral-600 dark:text-neutral-400 leading-normal tracking-wide">
+                "One must still have chaos in oneself, to give birth to a dancing star."
+              </p>
+              <p class="font-sans text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 leading-normal whitespace-nowrap">
+                「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」
+              </p>
+              <span class="font-mono text-[10px] text-neutral-500 dark:text-neutral-500 mt-1 uppercase tracking-widest">
+                — Nietzsche
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Profile Info Details -->
+        <div class="space-y-4 w-full">
+          <div>
+            <h1 id="profile-name" class="font-sans font-semibold text-2xl md:text-3xl tracking-tight text-neutral-900 dark:text-white max-w-full px-2 leading-tight">
+              Quincy Chen
+            </h1>
+            <div class="flex items-center justify-center gap-1.5 text-neutral-500 dark:text-neutral-400 text-sm mt-1">
+              <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+              <span id="profile-location" class="font-sans">台北, 台灣</span>
+            </div>
+          </div>
+
+          <p id="profile-bio" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed px-4 max-w-sm mx-auto">
+            獨立品牌設計師 & 創意總監。致力於將高對比、極簡線條與極致對稱美學，融入數位產品與實體媒介中。
+          </p>
+
+          <!-- Quick info tag -->
+          <div class="pt-2">
+            <a
+              id="profile-email-btn"
+              href="mailto:quincychen0313@gmail.com"
+              class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-mono text-neutral-500 dark:text-neutral-400 uppercase hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200 transition-all duration-300 shadow-sm hover:scale-[1.02]"
+            >
+              <i data-lucide="mail" class="w-3 h-3"></i>
+              <span>quincychen0313@gmail.com</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- RIGHT PANEL: Dynamic Navigation Content -->
+      <div class="md:col-span-7 p-10 flex flex-col justify-between">
+        
+        <!-- Tabs Selector (Liquid Glass) -->
+        <div class="mb-6">
+          <div id="tab-bar" class="relative inline-flex items-center gap-1 p-1.5 rounded-full bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200/70 dark:border-neutral-700/50 shadow-inner">
+            <div id="glass-pill"></div>
+            <button
+              id="tab-btn-links"
+              onclick="switchTab('links')"
+              class="relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-semibold text-neutral-900 dark:text-white transition-colors duration-300"
+            >
+              <i data-lucide="globe" class="w-4 h-4"></i>
+              <span>社群連結</span>
+            </button>
+            <button
+              id="tab-btn-guestbook"
+              onclick="switchTab('guestbook')"
+              class="relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300"
+            >
+              <i data-lucide="message-square" class="w-4 h-4"></i>
+              <span>留言板</span>
+            </button>
+            <button
+              id="tab-btn-about"
+              onclick="switchTab('about')"
+              class="relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300"
+            >
+              <i data-lucide="info" class="w-4 h-4"></i>
+              <span>關於我</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Active Tab Screen -->
+        <div class="h-[520px] md:h-[600px]">
+          
+          <!-- TAB: LINKS -->
+          <div id="tab-content-links" class="h-full overflow-y-auto custom-scrollbar pr-2 space-y-4 transition-all duration-300">
+            <!-- Link 1: Website -->
+            <a
+              id="website-link"
+              href="https://quincychen0313.github.io"
+              target="_blank"
+              rel="noreferrer"
+              class="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all duration-300 group hover:-translate-y-0.5"
+            >
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform text-neutral-900 dark:text-neutral-100">
+                  <i data-lucide="globe" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">個人網頁入口 / 作品集</span>
+                  </div>
+                  <span id="text-web-url" class="block font-mono text-xs text-neutral-400 mt-0.5">quincychen0313.github.io</span>
+                  <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">探索更多設計專案與數位產品作品集</p>
+                </div>
+              </div>
+              <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 group-hover:scale-110 transition-all mr-1 w-5 h-5"></i>
+            </a>
+
+            <!-- Link 2: Instagram -->
+            <a
+              id="instagram-link"
+              href="https://www.instagram.com/quincychen0313/"
+              target="_blank"
+              rel="noreferrer"
+              class="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-pink-100 dark:border-pink-900/30 bg-pink-50 dark:bg-pink-950/20 hover:bg-pink-100/80 dark:hover:bg-pink-950/30 transition-all duration-300 group hover:-translate-y-0.5"
+            >
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform text-pink-600 dark:text-pink-400">
+                  <i data-lucide="instagram" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Instagram</span>
+                  </div>
+                  <span id="text-ig-username" class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
+                  <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">生活日常、攝影作品與美學設計點滴</p>
+                </div>
+              </div>
+              <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 group-hover:scale-110 transition-all mr-1 w-5 h-5"></i>
+            </a>
+
+            <!-- Link 3: LINE (Modal button) -->
+            <button
+              onclick="openLineModal()"
+              class="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-[#06C755]/20 bg-[#06C755]/10 hover:bg-[#06C755]/15 dark:bg-[#06C755]/10 dark:hover:bg-[#06C755]/15 transition-all duration-300 group hover:-translate-y-0.5 cursor-pointer"
+            >
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform text-[#06C755]">
+                  <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current">
+                    <path d="M12 2C6.48 2 2 5.58 2 10c0 3.96 3.54 7.28 8.32 7.82.32.04.76.22.87.55l-.26 1.58c-.04.22-.17.88.13.97.3.09.82-.44 1.13-.77l2.5-2.73c2.09-.4 3.78-1.57 4.79-3.23.49-.81.72-1.74.72-2.71 0-4.42-4.48-8-10-8zm-3.8 11.12c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4s.4.18.4.4v5.04c0 .22-.18.4-.4.4zm2.84-.4c0 .22-.18.4-.4.4H8.8c-.22 0-.4-.18-.4-.4s.18-.4.4-.4h1.44V7.28c0-.22.18-.4.4-.4s.4.18.4.4v5.04zm3.08-.4c0 .22-.18.4-.4.4h-1.8c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4s.4.18.4.4v11.2h1c.22 0 .4.18.4.4s-.18.4-.4.4zm3.04-3.84c0 .22-.18.4-.4.4H15.1v1h1.28c.22 0 .4.18.4.4s-.18.4-.4.4H15.1v1h1.68c.22 0 .4.18.4.4s-.18.4-.4.4h-2.08c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4h2.08c.22 0 .4.18.4.4s-.18.4-.4.4z" />
+                  </svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">LINE 聯絡我</span>
+                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded-full bg-[#06C755]/20 text-[#06C755] text-[10px] font-mono font-medium">QR Code</span>
+                  </div>
+                  <span id="text-line-id" class="block font-mono text-xs text-neutral-400 mt-0.5">ID: quincychen0313</span>
+                  <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">即時溝通合作、商務洽詢或快速對話</p>
+                </div>
+              </div>
+              <i data-lucide="qr-code" class="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 group-hover:scale-110 transition-all mr-1 w-5 h-5"></i>
+            </button>
+
+            <!-- Link 4: Facebook -->
+            <a
+              id="facebook-link"
+              href="https://www.facebook.com/quincychen0313"
+              target="_blank"
+              rel="noreferrer"
+              class="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 hover:bg-blue-100/80 dark:hover:bg-blue-950/30 transition-all duration-300 group hover:-translate-y-0.5"
+            >
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform text-blue-600 dark:text-blue-400">
+                  <i data-lucide="facebook" class="w-6 h-6"></i>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Facebook</span>
+                  </div>
+                  <span id="text-fb-username" class="block font-mono text-xs text-neutral-400 mt-0.5">Quincy Chen</span>
+                  <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">專業文章、設計觀點與趨勢分享</p>
+                </div>
+              </div>
+              <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 group-hover:scale-110 transition-all mr-1 w-5 h-5"></i>
+            </a>
+
+            <!-- Link 5: Threads -->
+            <a
+              id="threads-link"
+              href="https://www.threads.net/@quincychen0313"
+              target="_blank"
+              rel="noreferrer"
+              class="w-full text-left flex items-center justify-between p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800/50 bg-neutral-100/60 dark:bg-neutral-900/50 hover:bg-neutral-200/60 dark:hover:bg-neutral-900/80 transition-all duration-300 group hover:-translate-y-0.5"
+            >
+              <div class="flex items-center gap-4">
+                <div class="p-3 rounded-xl bg-white dark:bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform text-neutral-900 dark:text-neutral-100">
+                  <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current">
+                    <path d="M12.16 2a10.15 10.15 0 0 0-10.1 10.16c0 5.48 4.38 9.9 10 9.9h.16a10.3 10.3 0 0 0 7.82-3.47 1 1 0 1 0-1.52-1.3 8.3 8.3 0 0 1-6.3 2.77h-.16c-4.44 0-8-3.53-8-7.9a8.15 8.15 0 0 1 8-8.16 8.24 8.24 0 0 1 8.24 8.24c0 2-.92 3.63-2.48 3.63a1.5 1.5 0 0 1-1.34-1c0-.15.06-.52.06-.52l.66-2.58a3 3 0 0 0-5.74-1.7l-.63 2.5a3.1 3.1 0 0 0 1.25 3.32c.8.55 1.74.83 2.68.83a3.52 3.52 0 0 0 3.32-2.12 5.2 5.2 0 0 0 .54-2.4c0-5.56-4.52-10-10.08-10zm-1.54 11.58c0-.05.02-.1.03-.15l.65-2.57c.18-.7.83-1.18 1.55-1.11.45.04.82.35.94.8.04.14.02.3-.03.44l-.65 2.58a1.32 1.32 0 0 1-1.12.92c-.7.08-1.31-.38-1.37-.92z"/>
+                  </svg>
+                </div>
+                <div>
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Threads</span>
+                  </div>
+                  <span id="text-threads-username" class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
+                  <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Threads 社群分享、生活碎念與日常互動</p>
+                </div>
+              </div>
+              <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-600 dark:group-hover:text-neutral-200 group-hover:scale-110 transition-all mr-1 w-5 h-5"></i>
+            </a>
+          </div>
+
+          <!-- TAB: GUESTBOOK -->
+          <div id="tab-content-guestbook" class="hidden h-full overflow-y-auto custom-scrollbar pr-2 space-y-6 transition-all duration-300">
+            <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
+              <div class="flex items-center gap-2">
+                <i data-lucide="message-square" class="text-neutral-500 dark:text-neutral-400 w-5 h-5"></i>
+                <h3 class="font-sans font-medium text-base uppercase tracking-wider text-neutral-800 dark:text-neutral-200">
+                  訪客留言板
+                </h3>
+              </div>
+              <div class="flex items-center gap-1 text-xs font-mono text-neutral-400">
+                <i data-lucide="sparkles" class="w-2.5 h-2.5"></i>
+                <span id="guestbook-count">2 則留言</span>
+              </div>
+            </div>
+
+            <!-- Form -->
+            <form id="guestbook-form" onsubmit="addGuestbookMessage(event)" class="space-y-3 bg-neutral-50 dark:bg-neutral-950 p-4 rounded-xl border border-neutral-100 dark:border-neutral-900">
+              <div>
+                <label for="guest-name" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+                  你的稱呼
+                </label>
+                <input
+                  id="guest-name"
+                  type="text"
+                  required
+                  placeholder="請輸入名字..."
+                  class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+                />
+              </div>
+
+              <div>
+                <label for="guest-message" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+                  留下你的祝福或留言
+                </label>
+                <textarea
+                  id="guest-message"
+                  required
+                  rows="2"
+                  placeholder="寫點什麼給 Quincy 吧..."
+                  maxlength="150"
+                  oninput="updateCharCount(this)"
+                  class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors resize-none"
+                ></textarea>
+                <div class="flex justify-end text-xs font-mono text-neutral-400 mt-1">
+                  <span id="char-count">0</span>/150 字
+                </div>
+              </div>
+
+              <button
+                id="guestbook-submit-btn"
+                type="submit"
+                class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black font-sans text-sm font-semibold hover:opacity-90 active:scale-[0.98] transition-all"
+              >
+                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                <span>送出留言</span>
+              </button>
+            </form>
+
+            <!-- Message list -->
+            <div id="guestbook-messages" class="space-y-3">
+              <!-- Dynamically populated -->
+            </div>
+          </div>
+
+          <!-- TAB: ABOUT -->
+          <div id="tab-content-about" class="hidden h-full overflow-y-auto custom-scrollbar pr-2 space-y-4 transition-all duration-300">
+            <div class="prose prose-neutral dark:prose-invert max-w-none text-sm leading-relaxed space-y-4 text-neutral-600 dark:text-neutral-350 font-sans">
+              <div class="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
+                <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="file-text" class="text-neutral-500 w-4 h-4"></i>
+                  個人簡介 & 設計理念
+                </h4>
+                <p>
+                  你好，我是 Quincy！專注於極簡美學與品牌識別設計。我深信「好的設計不是增加多餘，而是減少贅飾直到完美」。
+                </p>
+              </div>
+
+              <div class="p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
+                <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
+                  <i data-lucide="sparkles" class="text-amber-500 w-4 h-4"></i>
+                  關於個人 Logo 識別
+                </h4>
+                <p>
+                  我這款獨特個人 Logo 的核心設計，是利用書法、哥德字體與現代流線幾何相融合的字母 
+                  <strong class="text-neutral-900 dark:text-white mx-1 font-mono font-bold">QUINCY</strong>，
+                  交織構築出西裝大衣的修長肩線與西裝翻領，上方承接俐落白描的帥氣男士側面與硬朗髮型。
+                  這代表著將「個人姓名」直接塑造為「服裝軀幹」，極富前衛時裝定製概念與極簡精緻風格。
+                </p>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 pt-2">
+                <div class="border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
+                  <span class="block text-xs font-mono text-neutral-400 uppercase">設計語彙</span>
+                  <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">極簡主義 / 高對比 / 流線</span>
+                </div>
+                <div class="border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
+                  <span class="block text-xs font-mono text-neutral-400 uppercase">合作洽談</span>
+                  <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Instagram DM / LINE 聯絡</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- Micro footer inside right panel -->
+        <div class="border-t border-neutral-100 dark:border-neutral-850 pt-4 mt-6 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+          <span>© <span id="footer-year">2026</span> <span id="footer-name">Quincy Chen</span>. ALL RIGHTS RESERVED.</span>
+          <span class="hidden sm:inline">MINIMALISM IS AN ATTITUDE.</span>
+        </div>
+
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- LINE QR Modal -->
+  <div id="line-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs opacity-0 pointer-events-none transition-all duration-300">
+    <div class="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-2xl border border-neutral-100 dark:border-neutral-800 text-center transform scale-95 transition-all duration-300">
+      
+      <!-- Close button -->
+      <button
+        onclick="closeLineModal()"
+        class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <!-- Logo & Heading -->
+      <div class="flex flex-col items-center mb-5">
+        <div class="w-10 h-10 rounded-full bg-[#06C755]/10 flex items-center justify-center text-[#06C755] mb-2">
+          <svg viewBox="0 0 24 24" class="w-5 h-5 fill-current">
+            <path d="M12 2C6.48 2 2 5.58 2 10c0 3.96 3.54 7.28 8.32 7.82.32.04.76.22.87.55l-.26 1.58c-.04.22-.17.88.13.97.3.09.82-.44 1.13-.77l2.5-2.73c2.09-.4 3.78-1.57 4.79-3.23.49-.81.72-1.74.72-2.71 0-4.42-4.48-8-10-8zm-3.8 11.12c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4s.4.18.4.4v5.04c0 .22-.18.4-.4.4zm2.84-.4c0 .22-.18.4-.4.4H8.8c-.22 0-.4-.18-.4-.4s.18-.4.4-.4h1.44V7.28c0-.22.18-.4.4-.4s.4.18.4.4v5.04zm3.08-.4c0 .22-.18.4-.4.4h-1.8c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4s.4.18.4.4v11.2h1c.22 0 .4.18.4.4s-.18.4-.4.4zm3.04-3.84c0 .22-.18.4-.4.4H15.1v1h1.28c.22 0 .4.18.4.4s-.18.4-.4.4H15.1v1h1.68c.22 0 .4.18.4.4s-.18.4-.4.4h-2.08c-.22 0-.4-.18-.4-.4V7.28c0-.22.18-.4.4-.4h2.08c.22 0 .4.18.4.4s-.18.4-.4.4z" />
+          </svg>
+        </div>
+        <h3 class="font-sans font-bold text-base text-neutral-850 dark:text-neutral-100">
+          加入 LINE 好友
+        </h3>
+      </div>
+
+      <!-- QR Code Container -->
+      <div class="relative mx-auto w-48 h-48 bg-white p-3 rounded-xl border border-neutral-100 dark:border-neutral-800 shadow-sm mb-4 flex items-center justify-center select-none overflow-hidden">
+        <svg viewBox="0 0 45 45" class="w-full h-full text-neutral-900" shape-rendering="crispEdges">
+          <!-- Background -->
+          <rect width="45" height="45" fill="white" />
+          
+          <!-- Top-Left Finder Pattern -->
+          <rect x="0" y="0" width="7" height="7" fill="black" />
+          <rect x="1" y="1" width="5" height="5" fill="white" />
+          <rect x="2" y="2" width="3" height="3" fill="black" />
+          
+          <!-- Top-Right Finder Pattern -->
+          <rect x="38" y="0" width="7" height="7" fill="black" />
+          <rect x="39" y="1" width="5" height="5" fill="white" />
+          <rect x="40" y="2" width="3" height="3" fill="black" />
+          
+          <!-- Bottom-Left Finder Pattern -->
+          <rect x="0" y="38" width="7" height="7" fill="black" />
+          <rect x="1" y="39" width="5" height="5" fill="white" />
+          <rect x="2" y="40" width="3" height="3" fill="black" />
+
+          <!-- Alignment Pattern -->
+          <rect x="30" y="30" width="5" height="5" fill="black" />
+          <rect x="31" y="31" width="3" height="3" fill="white" />
+          <rect x="32" y="32" width="1" height="1" fill="black" />
+
+          <!-- Exact pixel patterns matching the uploaded QR Code -->
+          <!-- Row 0 -->
+          <rect x="8" y="2" width="1" height="1" fill="black" /><rect x="12" y="2" width="1" height="2" fill="black" /><rect x="14" y="2" width="2" height="1" fill="black" /><rect x="19" y="2" width="1" height="1" fill="black" /><rect x="22" y="2" width="1" height="3" fill="black" /><rect x="25" y="2" width="2" height="1" fill="black" /><rect x="28" y="2" width="1" height="1" fill="black" /><rect x="31" y="2" width="1" height="1" fill="black" /><rect x="34" y="2" width="2" height="2" fill="black" />
+          <!-- Row 1 -->
+          <rect x="8" y="4" width="2" height="1" fill="black" /><rect x="11" y="4" width="1" height="1" fill="black" /><rect x="15" y="4" width="1" height="2" fill="black" /><rect x="18" y="4" width="3" height="1" fill="black" /><rect x="24" y="4" width="1" height="1" fill="black" /><rect x="27" y="4" width="2" height="1" fill="black" /><rect x="30" y="4" width="1" height="2" fill="black" /><rect x="33" y="4" width="1" height="1" fill="black" />
+          <!-- Row 2 -->
+          <rect x="9" y="6" width="1" height="1" fill="black" /><rect x="12" y="6" width="2" height="1" fill="black" /><rect x="16" y="6" width="1" height="1" fill="black" /><rect x="20" y="6" width="1" height="2" fill="black" /><rect x="22" y="6" width="2" height="1" fill="black" /><rect x="26" y="6" width="1" height="1" fill="black" /><rect x="28" y="6" width="1" height="2" fill="black" /><rect x="32" y="6" width="2" height="1" fill="black" /><rect x="35" y="6" width="1" height="1" fill="black" />
+          <!-- Row 3 -->
+          <rect x="0" y="8" width="1" height="1" fill="black" /><rect x="4" y="8" width="1" height="2" fill="black" /><rect x="6" y="8" width="1" height="1" fill="black" /><rect x="8" y="8" width="2" height="1" fill="black" /><rect x="11" y="8" width="1" height="1" fill="black" /><rect x="13" y="8" width="3" height="1" fill="black" /><rect x="18" y="8" width="1" height="1" fill="black" /><rect x="24" y="8" width="2" height="1" fill="black" /><rect x="27" y="8" width="1" height="1" fill="black" /><rect x="29" y="8" width="1" height="3" fill="black" /><rect x="31" y="8" width="2" height="1" fill="black" /><rect x="34" y="8" width="1" height="1" fill="black" /><rect x="37" y="8" width="2" height="1" fill="black" /><rect x="40" y="8" width="1" height="2" fill="black" /><rect x="42" y="8" width="1" height="1" fill="black" /><rect x="44" y="8" width="1" height="1" fill="black" />
+          <!-- Row 4 -->
+          <rect x="1" y="10" width="1" height="1" fill="black" /><rect x="3" y="10" width="1" height="1" fill="black" /><rect x="5" y="10" width="1" height="2" fill="black" /><rect x="8" y="10" width="1" height="1" fill="black" /><rect x="10" y="10" width="2" height="1" fill="black" /><rect x="14" y="10" width="1" height="1" fill="black" /><rect x="16" y="10" width="1" height="3" fill="black" /><rect x="19" y="10" width="1" height="1" fill="black" /><rect x="21" y="10" width="2" height="1" fill="black" /><rect x="25" y="10" width="1" height="1" fill="black" /><rect x="27" y="10" width="1" height="1" fill="black" /><rect x="32" y="10" width="1" height="2" fill="black" /><rect x="35" y="10" width="2" height="1" fill="black" /><rect x="38" y="10" width="1" height="1" fill="black" /><rect x="41" y="10" width="3" height="1" fill="black" />
+          <!-- Row 5 -->
+          <rect x="0" y="12" width="2" height="1" fill="black" /><rect x="3" y="12" width="1" height="1" fill="black" /><rect x="6" y="12" width="2" height="1" fill="black" /><rect x="9" y="12" width="1" height="1" fill="black" /><rect x="12" y="12" width="1" height="1" fill="black" /><rect x="15" y="12" width="1" height="1" fill="black" /><rect x="18" y="12" width="1" height="2" fill="black" /><rect x="20" y="12" width="1" height="1" fill="black" /><rect x="23" y="12" width="2" height="1" fill="black" /><rect x="26" y="12" width="1" height="1" fill="black" /><rect x="28" y="12" width="1" height="1" fill="black" /><rect x="30" y="12" width="1" height="1" fill="black" /><rect x="34" y="12" width="1" height="2" fill="black" /><rect x="36" y="12" width="2" height="1" fill="black" /><rect x="39" y="12" width="1" height="1" fill="black" /><rect x="42" y="12" width="2" height="1" fill="black" />
+          <!-- Row 6 -->
+          <rect x="2" y="14" width="1" height="1" fill="black" /><rect x="4" y="14" width="2" height="1" fill="black" /><rect x="8" y="14" width="1" height="1" fill="black" /><rect x="10" y="14" width="1" height="1" fill="black" /><rect x="13" y="14" width="2" height="1" fill="black" /><rect x="16" y="14" width="2" height="1" fill="black" /><rect x="21" y="14" width="2" height="1" fill="black" /><rect x="24" y="14" width="1" height="1" fill="black" /><rect x="27" y="14" width="1" height="1" fill="black" /><rect x="29" y="14" width="1" height="1" fill="black" /><rect x="31" y="14" width="2" height="1" fill="black" /><rect x="35" y="14" width="1" height="1" fill="black" /><rect x="38" y="14" width="1" height="2" fill="black" /><rect x="40" y="14" width="1" height="1" fill="black" /><rect x="43" y="14" width="1" height="1" fill="black" />
+          <!-- Row 7 -->
+          <rect x="0" y="16" width="1" height="2" fill="black" /><rect x="3" y="16" width="1" height="1" fill="black" /><rect x="5" y="16" width="1" height="1" fill="black" /><rect x="7" y="16" width="2" height="1" fill="black" /><rect x="11" y="16" width="2" height="1" fill="black" /><rect x="14" y="16" width="1" height="1" fill="black" /><rect x="17" y="16" width="1" height="1" fill="black" /><rect x="19" y="16" width="2" height="1" fill="black" /><rect x="23" y="16" width="1" height="1" fill="black" /><rect x="25" y="16" width="2" height="1" fill="black" /><rect x="28" y="16" width="1" height="1" fill="black" /><rect x="30" y="16" width="1" height="1" fill="black" /><rect x="33" y="16" width="1" height="2" fill="black" /><rect x="36" y="16" width="1" height="1" fill="black" /><rect x="41" y="16" width="2" height="1" fill="black" /><rect x="44" y="16" width="1" height="1" fill="black" />
+          <!-- Row 8 -->
+          <rect x="2" y="18" width="1" height="1" fill="black" /><rect x="4" y="18" width="1" height="1" fill="black" /><rect x="6" y="18" width="2" height="1" fill="black" /><rect x="9" y="18" width="1" height="1" fill="black" /><rect x="12" y="18" width="2" height="1" fill="black" /><rect x="15" y="18" width="1" height="1" fill="black" /><rect x="18" y="18" width="1" height="1" fill="black" /><rect x="20" y="18" width="2" height="1" fill="black" /><rect x="24" y="18" width="2" height="1" fill="black" /><rect x="27" y="18" width="1" height="1" fill="black" /><rect x="29" y="18" width="1" height="1" fill="black" /><rect x="31" y="18" width="1" height="1" fill="black" /><rect x="35" y="18" width="2" height="1" fill="black" /><rect x="38" y="18" width="1" height="1" fill="black" /><rect x="40" y="18" width="2" height="1" fill="black" /><rect x="43" y="18" width="1" height="1" fill="black" />
+          <!-- Row 9 -->
+          <rect x="0" y="20" width="2" height="1" fill="black" /><rect x="3" y="20" width="1" height="1" fill="black" /><rect x="5" y="20" width="1" height="2" fill="black" /><rect x="8" y="20" width="1" height="1" fill="black" /><rect x="10" y="20" width="1" height="1" fill="black" /><rect x="13" y="20" width="1" height="1" fill="black" /><rect x="16" y="20" width="1" height="1" fill="black" /><rect x="26" y="20" width="2" height="1" fill="black" /><rect x="29" y="20" width="1" height="1" fill="black" /><rect x="32" y="20" width="1" height="1" fill="black" /><rect x="34" y="20" width="1" height="1" fill="black" /><rect x="36" y="20" width="2" height="1" fill="black" /><rect x="39" y="20" width="1" height="1" fill="black" /><rect x="41" y="20" width="1" height="1" fill="black" /><rect x="43" y="20" width="2" height="1" fill="black" />
+          <!-- Row 10 -->
+          <rect x="1" y="22" width="1" height="1" fill="black" /><rect x="4" y="22" width="1" height="1" fill="black" /><rect x="7" y="22" width="1" height="1" fill="black" /><rect x="9" y="22" width="2" height="1" fill="black" /><rect x="12" y="22" width="2" height="1" fill="black" /><rect x="15" y="22" width="1" height="1" fill="black" /><rect x="27" y="22" width="1" height="2" fill="black" /><rect x="29" y="22" width="1" height="1" fill="black" /><rect x="31" y="22" width="2" height="1" fill="black" /><rect x="35" y="22" width="1" height="1" fill="black" /><rect x="37" y="22" width="1" height="1" fill="black" /><rect x="40" y="22" width="2" height="1" fill="black" /><rect x="43" y="22" width="1" height="1" fill="black" />
+          <!-- Row 11 -->
+          <rect x="0" y="24" width="2" height="1" fill="black" /><rect x="3" y="24" width="1" height="1" fill="black" /><rect x="6" y="24" width="1" height="2" fill="black" /><rect x="8" y="24" width="2" height="1" fill="black" /><rect x="11" y="24" width="1" height="1" fill="black" /><rect x="14" y="24" width="1" height="1" fill="black" /><rect x="27" y="24" width="1" height="1" fill="black" /><rect x="30" y="24" width="1" height="1" fill="black" /><rect x="32" y="24" width="2" height="1" fill="black" /><rect x="36" y="24" width="1" height="1" fill="black" /><rect x="38" y="24" width="2" height="1" fill="black" /><rect x="41" y="24" width="1" height="1" fill="black" /><rect x="43" y="24" width="2" height="1" fill="black" />
+          <!-- Row 12 -->
+          <rect x="1" y="26" width="1" height="1" fill="black" /><rect x="4" y="26" width="2" height="1" fill="black" /><rect x="9" y="26" width="2" height="1" fill="black" /><rect x="12" y="26" width="1" height="1" fill="black" /><rect x="15" y="26" width="1" height="1" fill="black" /><rect x="27" y="26" width="2" height="1" fill="black" /><rect x="31" y="26" width="1" height="2" fill="black" /><rect x="33" y="26" width="1" height="1" fill="black" /><rect x="35" y="26" width="2" height="1" fill="black" /><rect x="39" y="26" width="1" height="1" fill="black" /><rect x="41" y="26" width="2" height="1" fill="black" /><rect x="44" y="26" width="1" height="1" fill="black" />
+          <!-- Row 13 -->
+          <rect x="0" y="28" width="1" height="1" fill="black" /><rect x="3" y="28" width="1" height="1" fill="black" /><rect x="5" y="28" width="2" height="1" fill="black" /><rect x="8" y="28" width="1" height="1" fill="black" /><rect x="10" y="28" width="2" height="1" fill="black" /><rect x="13" y="28" width="2" height="1" fill="black" /><rect x="16" y="28" width="1" height="1" fill="black" /><rect x="18" y="28" width="1" height="1" fill="black" /><rect x="21" y="28" width="1" height="1" fill="black" /><rect x="23" y="28" width="2" height="1" fill="black" /><rect x="26" y="28" width="1" height="1" fill="black" /><rect x="28" y="28" width="1" height="1" fill="black" /><rect x="30" y="28" width="1" height="1" fill="black" /><rect x="34" y="28" width="2" height="1" fill="black" /><rect x="37" y="28" width="1" height="1" fill="black" /><rect x="40" y="28" width="1" height="1" fill="black" /><rect x="42" y="28" width="2" height="1" fill="black" />
+          <!-- Row 14 -->
+          <rect x="1" y="30" width="2" height="1" fill="black" /><rect x="4" y="30" width="1" height="1" fill="black" /><rect x="7" y="30" width="1" height="2" fill="black" /><rect x="9" y="30" width="1" height="1" fill="black" /><rect x="11" y="30" width="1" height="1" fill="black" /><rect x="14" y="30" width="1" height="1" fill="black" /><rect x="17" y="30" width="1" height="1" fill="black" /><rect x="19" y="30" width="1" height="1" fill="black" /><rect x="22" y="30" width="1" height="1" fill="black" /><rect x="24" y="30" width="2" height="1" fill="black" /><rect x="27" y="30" width="1" height="1" fill="black" /><rect x="37" y="30" width="1" height="1" fill="black" /><rect x="39" y="30" width="1" height="1" fill="black" /><rect x="41" y="30" width="2" height="1" fill="black" /><rect x="44" y="30" width="1" height="1" fill="black" />
+          <!-- Row 15 -->
+          <rect x="0" y="32" width="1" height="1" fill="black" /><rect x="3" y="32" width="1" height="1" fill="black" /><rect x="5" y="32" width="1" height="1" fill="black" /><rect x="8" y="32" width="1" height="1" fill="black" /><rect x="10" y="32" width="1" height="1" fill="black" /><rect x="12" y="32" width="2" height="1" fill="black" /><rect x="15" y="32" width="1" height="1" fill="black" /><rect x="18" y="32" width="1" height="2" fill="black" /><rect x="20" y="32" width="1" height="1" fill="black" /><rect x="23" y="32" width="2" height="1" fill="black" /><rect x="26" y="32" width="1" height="1" fill="black" /><rect x="28" y="32" width="2" height="1" fill="black" /><rect x="36" y="32" width="2" height="1" fill="black" /><rect x="39" y="32" width="1" height="2" fill="black" /><rect x="42" y="32" width="1" height="1" fill="black" />
+          <!-- Row 16 -->
+          <rect x="1" y="34" width="2" height="1" fill="black" /><rect x="4" y="34" width="2" height="1" fill="black" /><rect x="7" y="34" width="1" height="1" fill="black" /><rect x="9" y="34" width="1" height="1" fill="black" /><rect x="11" y="34" width="1" height="1" fill="black" /><rect x="13" y="34" width="1" height="2" fill="black" /><rect x="16" y="34" width="1" height="1" fill="black" /><rect x="21" y="34" width="1" height="1" fill="black" /><rect x="24" y="34" width="1" height="1" fill="black" /><rect x="27" y="34" width="1" height="1" fill="black" /><rect x="29" y="34" width="1" height="1" fill="black" /><rect x="36" y="34" width="1" height="1" fill="black" /><rect x="41" y="34" width="2" height="1" fill="black" /><rect x="44" y="34" width="1" height="1" fill="black" />
+          <!-- Row 17 -->
+          <rect x="0" y="36" width="1" height="1" fill="black" /><rect x="3" y="36" width="1" height="1" fill="black" /><rect x="5" y="36" width="1" height="1" fill="black" /><rect x="8" y="36" width="2" height="1" fill="black" /><rect x="11" y="36" width="1" height="1" fill="black" /><rect x="15" y="36" width="1" height="1" fill="black" /><rect x="18" y="36" width="1" height="1" fill="black" /><rect x="20" y="36" width="2" height="1" fill="black" /><rect x="23" y="36" width="1" height="1" fill="black" /><rect x="25" y="36" width="1" height="2" fill="black" /><rect x="28" y="36" width="2" height="1" fill="black" /><rect x="36" y="36" width="1" height="1" fill="black" /><rect x="38" y="36" width="1" height="1" fill="black" /><rect x="40" y="36" width="2" height="1" fill="black" /><rect x="43" y="36" width="1" height="1" fill="black" />
+
+          <!-- Cover Center Area for LINE Logo -->
+          <rect x="16" y="16" width="13" height="13" fill="white" />
+        </svg>
+        
+        <!-- LINE Center Logo Overlay -->
+        <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
+          <div class="w-10 h-10 bg-white p-0.5 rounded-lg shadow-sm flex items-center justify-center">
+            <img 
+              src="https://upload.wikimedia.org/wikipedia/commons/4/41/LINE_logo.svg" 
+              alt="LINE" 
+              class="w-full h-full rounded-[5px]"
+            />
+          </div>
+        </div>
+        
+        <!-- Scan Animation Line -->
+        <div class="absolute left-3 right-3 h-0.5 bg-[#06C755] opacity-80 shadow-[0_0_8px_#06C755]" style="animation: scan 2s ease-in-out infinite alternate;"></div>
+        <style>
+          @keyframes scan {
+            0% { top: 5%; }
+            100% { top: 95%; }
+          }
+        </style>
+      </div>
+
+      <p class="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto mb-4 leading-relaxed">
+        請在 LINE 應用程式中，點選「加入好友」＞「行動條碼」並掃描上方條碼以加入聯絡人。
+      </p>
+
+      <!-- Copy ID Actions & Direct Link -->
+      <div class="bg-neutral-50 dark:bg-neutral-950 rounded-xl p-3 flex items-center justify-between border border-neutral-100 dark:border-neutral-850">
+        <a
+          id="modal-line-link"
+          href="https://line.me/ti/p/~quincychen0313"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="text-left group/lineid flex-1 hover:opacity-85 transition-all mr-2"
+        >
+          <span class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold group-hover/lineid:text-[#06C755] transition-colors flex items-center gap-1">
+            LINE ID (點擊開啟 APP)
+            <i data-lucide="external-link" class="inline opacity-60 group-hover/lineid:opacity-100 w-2.5 h-2.5"></i>
+          </span>
+          <span id="modal-line-id" class="font-mono text-sm text-neutral-850 dark:text-neutral-200 font-bold underline decoration-dotted decoration-neutral-300 dark:decoration-neutral-750 underline-offset-4 group-hover/lineid:text-[#06C755] dark:group-hover/lineid:text-[#06C755] transition-colors">
+            quincychen0313
+          </span>
+        </a>
+        
+        <button
+          onclick="copyLineId()"
+          id="copy-line-btn"
+          class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-all shrink-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-700"
+        >
+          <i data-lucide="copy" class="w-3 h-3"></i>
+          <span id="copy-text">複製 ID</span>
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Settings Configuration Modal -->
+  <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs opacity-0 pointer-events-none transition-all duration-300">
+    <div class="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-2xl border border-neutral-100 dark:border-neutral-800 text-left transform scale-95 transition-all duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar">
+      
+      <!-- Close button -->
+      <button
+        onclick="closeSettings()"
+        class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+      >
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+
+      <div class="mb-5 flex items-center gap-2">
+        <i data-lucide="settings" class="text-neutral-500 w-5 h-5"></i>
+        <h3 class="font-sans font-bold text-lg text-neutral-850 dark:text-neutral-100">
+          編輯網頁與個人連結
+        </h3>
+      </div>
+
+      <!-- Settings Form -->
+      <form onsubmit="saveSettings(event)" class="space-y-4">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <label for="input-name" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+              NAME / 姓名
+            </label>
+            <input
+              id="input-name"
+              type="text"
+              required
+              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+            />
+          </div>
+
+          <div>
+            <label for="input-location" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+              LOCATION / 居住地
+            </label>
+            <input
+              id="input-location"
+              type="text"
+              required
+              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label for="input-bio" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
+            SUBTITLE BIO / 簡介
+          </label>
+          <textarea
+            id="input-bio"
+            required
+            rows="3"
+            class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors resize-none"
+          ></textarea>
+        </div>
+
+        <div class="h-px bg-neutral-100 dark:bg-neutral-850 my-2"></div>
+
+        <h4 class="font-mono text-[10px] uppercase tracking-widest text-neutral-400 font-bold flex items-center gap-1.5 mb-2">
+          <i data-lucide="link" class="w-3.5 h-3.5"></i>
+          社群連結與 ID (Social Links)
+        </h4>
+
+        <div class="space-y-3">
+          <div>
+            <label for="input-web" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+              個人網頁 / 作品集網址
+            </label>
+            <input
+              id="input-web"
+              type="url"
+              required
+              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+            />
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="input-ig" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+                Instagram 網址
+              </label>
+              <input
+                id="input-ig"
+                type="url"
+                required
+                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label for="input-line" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+                LINE ID
+              </label>
+              <input
+                id="input-line"
+                type="text"
+                required
+                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+              />
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            <div>
+              <label for="input-fb" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+                Facebook 網址
+              </label>
+              <input
+                id="input-fb"
+                type="url"
+                required
+                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+              />
+            </div>
+
+            <div>
+              <label for="input-threads" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+                Threads 網址
+              </label>
+              <input
+                id="input-threads"
+                type="url"
+                required
+                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+              />
+            </div>
+          </div>
+
+          <div>
+            <label for="input-logo" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
+              自訂 Logo 圖片 URL (留空則使用預設黑白手繪極簡 Logo)
+            </label>
+            <input
+              id="input-logo"
+              type="url"
+              placeholder="https://example.com/logo.png"
+              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
+            />
+          </div>
+        </div>
+
+        <div class="pt-2 flex gap-3">
+          <button
+            type="button"
+            onclick="closeSettings()"
+            class="flex-1 py-2 px-4 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 font-sans text-xs font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-950 transition-colors"
+          >
+            取消
+          </button>
+          
+          <button
+            type="submit"
+            class="flex-1 py-2 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black font-sans text-xs font-semibold hover:opacity-90 active:scale-[0.98] transition-all"
+          >
+            確認儲存
+          </button>
+        </div>
+
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // --- STATE MANAGEMENT ---
+    let state = {
+      darkMode: true,
+      activeTab: 'links',
+      profileName: 'Quincy Chen / 陳宏瑋',
+      profileLocation: '台北, 台灣',
+      profileBio: '獨立品牌設計師 & 創意總監。致力於將高對比、極簡線條與極致對稱美學，融入數位產品與實體媒介中。',
+      personalWebUrl: 'https://quincychen0313.github.io',
+      instagramUrl: 'https://www.instagram.com/quincychen0313/',
+      lineId: 'quincychen0313',
+      facebookUrl: 'https://www.facebook.com/quincychen0313',
+      threadsUrl: 'https://www.threads.net/@quincychen0313',
+      customLogoUrl: '',
+      messages: [
+        {
+          id: '1',
+          name: 'Vivian Chiang',
+          message: '太酷了！這個個人網站的黑白極簡風格跟 Logo 設計完全一致，非常有質感！🔥',
+          timestamp: '2026-07-16 14:32',
+          avatarColor: 'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300'
+        },
+        {
+          id: '2',
+          name: 'Alex Lin',
+          message: '設計細節拉滿，黑白線條感的頭像真的很帥氣。祝網頁入口順利上線！🙌',
+          timestamp: '2026-07-17 09:15',
+          avatarColor: 'bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300'
+        }
+      ]
+    };
+
+    const AVATAR_COLORS = [
+      'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+      'bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300',
+      'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300',
+      'bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300',
+    ];
+
+    // --- INITIALIZATION ---
+    const DEFAULT_LOGO_SRC = document.getElementById('default-logo-img')?.src || '';
+
+    document.addEventListener("DOMContentLoaded", () => {
+      loadState();
+      applyTheme();
+      renderProfile();
+      renderLinks();
+      renderGuestbook();
+      lucide.createIcons();
+      // 玻璃膠囊初始定位(不帶動畫)
+      requestAnimationFrame(() => movePill(state.activeTab || 'links', false));
+    });
+
+    // 字型載入完成或視窗縮放後重新定位膠囊
+    window.addEventListener('load', () => movePill(state.activeTab || 'links', false));
+    window.addEventListener('resize', () => movePill(state.activeTab || 'links', false));
+
+    function loadState() {
+      // LocalStorage Sync
+      if (localStorage.getItem('quincy_dark_mode')) {
+        state.darkMode = localStorage.getItem('quincy_dark_mode') === 'true';
+      }
+      if (localStorage.getItem('quincy_profile_name')) {
+        state.profileName = localStorage.getItem('quincy_profile_name');
+      }
+      if (localStorage.getItem('quincy_profile_location')) {
+        state.profileLocation = localStorage.getItem('quincy_profile_location');
+      }
+      if (localStorage.getItem('quincy_profile_bio')) {
+        state.profileBio = localStorage.getItem('quincy_profile_bio');
+      }
+      if (localStorage.getItem('quincy_web_url')) {
+        state.personalWebUrl = localStorage.getItem('quincy_web_url');
+      }
+      if (localStorage.getItem('quincy_ig_url')) {
+        state.instagramUrl = localStorage.getItem('quincy_ig_url');
+      }
+      if (localStorage.getItem('quincy_line_id')) {
+        state.lineId = localStorage.getItem('quincy_line_id');
+      }
+      if (localStorage.getItem('quincy_fb_url')) {
+        state.facebookUrl = localStorage.getItem('quincy_fb_url');
+      }
+      if (localStorage.getItem('quincy_threads_url')) {
+        state.threadsUrl = localStorage.getItem('quincy_threads_url');
+      }
+      if (localStorage.getItem('quincy_custom_logo')) {
+        state.customLogoUrl = localStorage.getItem('quincy_custom_logo');
+      }
+      
+      const savedMessages = localStorage.getItem('quincy_guestbook_messages');
+      if (savedMessages) {
+        try {
+          state.messages = JSON.parse(savedMessages);
+        } catch(e) {}
+      }
+    }
+
+    function saveStateToStorage() {
+      localStorage.setItem('quincy_dark_mode', String(state.darkMode));
+      localStorage.setItem('quincy_profile_name', state.profileName);
+      localStorage.setItem('quincy_profile_location', state.profileLocation);
+      localStorage.setItem('quincy_profile_bio', state.profileBio);
+      localStorage.setItem('quincy_web_url', state.personalWebUrl);
+      localStorage.setItem('quincy_ig_url', state.instagramUrl);
+      localStorage.setItem('quincy_line_id', state.lineId);
+      localStorage.setItem('quincy_fb_url', state.facebookUrl);
+      localStorage.setItem('quincy_threads_url', state.threadsUrl);
+      if (state.customLogoUrl) {
+        localStorage.setItem('quincy_custom_logo', state.customLogoUrl);
+      } else {
+        localStorage.removeItem('quincy_custom_logo');
+      }
+      localStorage.setItem('quincy_guestbook_messages', JSON.stringify(state.messages));
+    }
+
+    // --- THEME ---
+    function toggleTheme() {
+      state.darkMode = !state.darkMode;
+      applyTheme();
+      saveStateToStorage();
+    }
+
+    function applyTheme() {
+      const root = document.documentElement;
+      const themeIcon = document.getElementById('theme-icon');
+      
+      if (state.darkMode) {
+        root.classList.add('dark');
+        if (themeIcon) {
+          themeIcon.setAttribute('data-lucide', 'sun');
+          themeIcon.className = "text-amber-400 w-[18px] h-[18px]";
+        }
+      } else {
+        root.classList.remove('dark');
+        if (themeIcon) {
+          themeIcon.setAttribute('data-lucide', 'moon');
+          themeIcon.className = "text-neutral-600 w-[18px] h-[18px]";
+        }
+      }
+      lucide.createIcons();
+    }
+
+    // --- RENDER PROFILE ---
+    function renderProfile() {
+      // 姓名:以「/」分隔的英文與中文姓名分成兩行顯示(不顯示斜線)
+      const nameEl = document.getElementById('profile-name');
+      const nameParts = String(state.profileName || '').split('/').map(s => s.trim()).filter(Boolean);
+      nameEl.textContent = '';
+      nameParts.forEach((part, i) => {
+        const span = document.createElement('span');
+        span.textContent = part;
+        span.className = 'block whitespace-nowrap truncate' + (i > 0 ? ' text-xl md:text-2xl mt-0.5 text-neutral-700 dark:text-neutral-300' : '');
+        nameEl.appendChild(span);
+      });
+      document.getElementById('profile-location').textContent = state.profileLocation;
+      document.getElementById('profile-bio').textContent = state.profileBio;
+      document.getElementById('footer-name').textContent = nameParts.join(' ');
+      document.getElementById('footer-year').textContent = new Date().getFullYear();
+
+      // Email link update
+      document.getElementById('profile-email-btn').setAttribute('href', `mailto:quincychen0313@gmail.com`);
+
+      // Logo update
+      const logoContainer = document.getElementById('logo-container');
+      const credit = document.getElementById('logo-credit');
+      if (state.customLogoUrl) {
+        logoContainer.innerHTML = `<img src="${state.customLogoUrl}" alt="Quincy Logo" class="w-full h-full object-contain max-h-full max-w-full drop-shadow-md rounded-full" />`;
+        credit.classList.add('hidden');
+      } else {
+        logoContainer.innerHTML = `<img id="default-logo-img" src="${DEFAULT_LOGO_SRC}" alt="Quincy Logo" class="w-full h-full object-contain invert dark:invert-0 transition-all duration-300 select-none drop-shadow-sm" />`;
+        credit.classList.remove('hidden');
+      }
+    }
+
+    // --- RENDER LINKS ---
+    function renderLinks() {
+      // 1. Website
+      const webLink = document.getElementById('website-link');
+      webLink.setAttribute('href', state.personalWebUrl);
+      document.getElementById('text-web-url').textContent = state.personalWebUrl.replace('https://', '').replace('http://', '');
+
+      // 2. Instagram
+      const igLink = document.getElementById('instagram-link');
+      igLink.setAttribute('href', state.instagramUrl);
+      const igUsername = state.instagramUrl.split('/').filter(Boolean).pop() || 'quincychen0313';
+      document.getElementById('text-ig-username').textContent = `@${igUsername}`;
+
+      // 3. LINE
+      document.getElementById('text-line-id').textContent = `ID: ${state.lineId}`;
+      document.getElementById('modal-line-id').textContent = state.lineId;
+      document.getElementById('modal-line-link').setAttribute('href', `https://line.me/ti/p/~${state.lineId}`);
+
+      // 4. Facebook
+      const fbLink = document.getElementById('facebook-link');
+      fbLink.setAttribute('href', state.facebookUrl);
+
+      // 5. Threads
+      const threadsLink = document.getElementById('threads-link');
+      threadsLink.setAttribute('href', state.threadsUrl);
+      const threadsUsername = state.threadsUrl.split('/').filter(Boolean).pop()?.replace('@', '') || 'quincychen0313';
+      document.getElementById('text-threads-username').textContent = `@${threadsUsername}`;
+    }
+
+    // --- TAB SWITCHER ---
+    // --- LIQUID GLASS PILL ---
+    function movePill(tabId, animate = true) {
+      const bar = document.getElementById('tab-bar');
+      const pill = document.getElementById('glass-pill');
+      const btn = document.getElementById(`tab-btn-${tabId}`);
+      if (!bar || !pill || !btn) return;
+
+      if (!animate) pill.style.transition = 'none';
+
+      const barRect = bar.getBoundingClientRect();
+      const btnRect = btn.getBoundingClientRect();
+      pill.style.left = (btnRect.left - barRect.left) + 'px';
+      pill.style.width = btnRect.width + 'px';
+
+      if (!animate) {
+        // 強制 reflow 後恢復動畫
+        void pill.offsetWidth;
+        pill.style.transition = '';
+        return;
+      }
+
+      // 液態擠壓 + 光澤掃過
+      bar.classList.remove('is-moving');
+      void pill.offsetWidth;
+      bar.classList.add('is-moving');
+      clearTimeout(movePill._t);
+      movePill._t = setTimeout(() => bar.classList.remove('is-moving'), 560);
+    }
+
+    function switchTab(tabId) {
+      const isSame = state.activeTab === tabId;
+      state.activeTab = tabId;
+      
+      const tabIds = ['links', 'guestbook', 'about'];
+      tabIds.forEach(id => {
+        const btn = document.getElementById(`tab-btn-${id}`);
+        const content = document.getElementById(`tab-content-${id}`);
+        
+        if (id === tabId) {
+          btn.className = "relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-semibold text-neutral-900 dark:text-white transition-colors duration-300";
+          content.classList.remove('hidden');
+          if (!isSame) {
+            // 重新觸發玻璃霧化淡入
+            content.classList.remove('tab-enter');
+            void content.offsetWidth;
+            content.classList.add('tab-enter');
+          }
+        } else {
+          btn.className = "relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300";
+          content.classList.add('hidden');
+        }
+      });
+      
+      movePill(tabId, !isSame);
+      lucide.createIcons();
+    }
+
+    // --- GUESTBOOK ---
+    function renderGuestbook() {
+      const messagesContainer = document.getElementById('guestbook-messages');
+      const countEl = document.getElementById('guestbook-count');
+      countEl.textContent = `${state.messages.length} 則留言`;
+
+      if (state.messages.length === 0) {
+        messagesContainer.innerHTML = `
+          <div class="py-8 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm space-y-2">
+            <i data-lucide="message-square" class="mx-auto w-8 h-8 opacity-40"></i>
+            <p>尚無留言。留下第一則祝福吧！</p>
+          </div>
+        `;
+        lucide.createIcons();
+        return;
+      }
+
+      messagesContainer.innerHTML = state.messages.map(msg => `
+        <div class="bg-neutral-50/50 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-neutral-100 dark:border-neutral-900 flex gap-3 group relative hover:border-neutral-200 dark:hover:border-neutral-800 transition-colors">
+          <div class="w-9 h-9 rounded-full ${msg.avatarColor} flex items-center justify-center font-sans text-xs font-bold shrink-0 shadow-2xs select-none">
+            ${msg.name.charAt(0).toUpperCase()}
+          </div>
+          <div class="flex-1 min-w-0">
+            <div class="flex items-baseline justify-between mb-0.5">
+              <span class="font-sans font-bold text-sm text-neutral-800 dark:text-neutral-200 truncate">
+                ${msg.name}
+              </span>
+              <span class="font-mono text-[10px] text-neutral-400">
+                ${msg.timestamp}
+              </span>
+            </div>
+            <p class="font-sans text-sm text-neutral-600 dark:text-neutral-350 leading-relaxed break-words">
+              ${msg.message}
+            </p>
+          </div>
+          
+          <!-- Delete button -->
+          <button
+            onclick="deleteMessage('${msg.id}')"
+            class="absolute top-3 right-3 p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 text-neutral-400 hover:text-red-500 transition-all"
+            title="刪除留言"
+          >
+            <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
+          </button>
+        </div>
+      `).join('');
+
+      lucide.createIcons();
+    }
+
+    function addGuestbookMessage(e) {
+      e.preventDefault();
+      const nameInput = document.getElementById('guest-name');
+      const messageInput = document.getElementById('guest-message');
+      
+      const name = nameInput.value.trim();
+      const message = messageInput.value.trim();
+      
+      if (!name || !message) return;
+
+      const submitBtn = document.getElementById('guestbook-submit-btn');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin"></span>`;
+
+      setTimeout(() => {
+        const now = new Date();
+        const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+        
+        const newMsg = {
+          id: Date.now().toString(),
+          name: name,
+          message: message,
+          timestamp: timestamp,
+          avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
+        };
+
+        state.messages.unshift(newMsg);
+        saveStateToStorage();
+        renderGuestbook();
+
+        nameInput.value = '';
+        messageInput.value = '';
+        document.getElementById('char-count').textContent = '0';
+
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<i data-lucide="send" class="w-3 h-3"></i><span>送出留言</span>`;
+        lucide.createIcons();
+
+        showToast("留言成功送出！已儲存於瀏覽器中。");
+      }, 400);
+    }
+
+    function deleteMessage(id) {
+      state.messages = state.messages.filter(m => m.id !== id);
+      saveStateToStorage();
+      renderGuestbook();
+      showToast("留言已刪除。");
+    }
+
+    function updateCharCount(textarea) {
+      document.getElementById('char-count').textContent = textarea.value.length;
+    }
+
+    // --- MODALS ---
+    function openLineModal() {
+      const modal = document.getElementById('line-modal');
+      modal.classList.remove('pointer-events-none', 'opacity-0');
+      modal.querySelector('div').classList.remove('scale-95');
+      modal.querySelector('div').classList.add('scale-100');
+    }
+
+    function closeLineModal() {
+      const modal = document.getElementById('line-modal');
+      modal.classList.add('pointer-events-none', 'opacity-0');
+      modal.querySelector('div').classList.add('scale-95');
+      modal.querySelector('div').classList.remove('scale-100');
+    }
+
+    async function copyLineId() {
+      try {
+        await navigator.clipboard.writeText(state.lineId);
+        const copyBtn = document.getElementById('copy-line-btn');
+        const copyText = document.getElementById('copy-text');
+        
+        copyBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-all shrink-0 bg-emerald-500 text-white";
+        copyText.textContent = "複製成功";
+        copyBtn.innerHTML = `<i data-lucide="check" class="w-3 h-3"></i><span id="copy-text">複製成功</span>`;
+        lucide.createIcons();
+
+        setTimeout(() => {
+          copyBtn.className = "flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-all shrink-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-700";
+          copyBtn.innerHTML = `<i data-lucide="copy" class="w-3 h-3"></i><span id="copy-text">複製 ID</span>`;
+          lucide.createIcons();
+        }, 2000);
+      } catch (err) {}
+    }
+
+    function openSettings() {
+      // Load current fields
+      document.getElementById('input-name').value = state.profileName;
+      document.getElementById('input-location').value = state.profileLocation;
+      document.getElementById('input-bio').value = state.profileBio;
+      document.getElementById('input-web').value = state.personalWebUrl;
+      document.getElementById('input-ig').value = state.instagramUrl;
+      document.getElementById('input-line').value = state.lineId;
+      document.getElementById('input-fb').value = state.facebookUrl;
+      document.getElementById('input-threads').value = state.threadsUrl;
+      document.getElementById('input-logo').value = state.customLogoUrl || '';
+
+      const modal = document.getElementById('settings-modal');
+      modal.classList.remove('pointer-events-none', 'opacity-0');
+      modal.querySelector('div').classList.remove('scale-95');
+      modal.querySelector('div').classList.add('scale-100');
+    }
+
+    function closeSettings() {
+      const modal = document.getElementById('settings-modal');
+      modal.classList.add('pointer-events-none', 'opacity-0');
+      modal.querySelector('div').classList.add('scale-95');
+      modal.querySelector('div').classList.remove('scale-100');
+    }
+
+    function saveSettings(e) {
+      e.preventDefault();
+      
+      state.profileName = document.getElementById('input-name').value;
+      state.profileLocation = document.getElementById('input-location').value;
+      state.profileBio = document.getElementById('input-bio').value;
+      state.personalWebUrl = document.getElementById('input-web').value;
+      state.instagramUrl = document.getElementById('input-ig').value;
+      state.lineId = document.getElementById('input-line').value;
+      state.facebookUrl = document.getElementById('input-fb').value;
+      state.threadsUrl = document.getElementById('input-threads').value;
+      state.customLogoUrl = document.getElementById('input-logo').value.trim();
+
+      saveStateToStorage();
+      renderProfile();
+      renderLinks();
+      closeSettings();
+      showToast("網頁資訊與個人連結已更新！");
+    }
+
+    // --- TOAST ALERT ---
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      
+      toast.classList.remove('-translate-y-20', 'opacity-0');
+      toast.classList.add('translate-y-0', 'opacity-100');
+
+      setTimeout(() => {
+        toast.classList.remove('translate-y-0', 'opacity-100');
+        toast.classList.add('-translate-y-20', 'opacity-0');
+      }, 3000);
+    }
+  </script>
+</body>
+</html>
