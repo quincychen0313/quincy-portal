@@ -114,6 +114,35 @@
       45%  { opacity: 0.9; }
       100% { opacity: 0; transform: translateX(60%); }
     }
+    /* ===== 主題膠囊開關(液態玻璃旋鈕) ===== */
+    #theme-knob {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 36px;
+      height: 36px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.96), rgba(255,255,255,0.68));
+      border: 1px solid rgba(255,255,255,0.75);
+      box-shadow:
+        0 2px 6px rgba(0,0,0,0.16),
+        inset 0 1px 0 rgba(255,255,255,0.95);
+      backdrop-filter: blur(8px) saturate(160%);
+      -webkit-backdrop-filter: blur(8px) saturate(160%);
+      transform: translateX(0);
+      transition: transform 0.45s cubic-bezier(0.30, 1.60, 0.36, 1), background 0.3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .dark #theme-knob {
+      transform: translateX(44px);
+      background: linear-gradient(135deg, rgba(255,255,255,0.30), rgba(255,255,255,0.10));
+      border-color: rgba(255,255,255,0.28);
+      box-shadow:
+        0 2px 8px rgba(0,0,0,0.50),
+        inset 0 1px 0 rgba(255,255,255,0.32);
+    }
+
     /* 內容切換:玻璃霧化淡入 */
     @keyframes glass-in {
       from { opacity: 0; filter: blur(12px); transform: translateY(8px) scale(0.985); }
@@ -123,6 +152,26 @@
       animation: glass-in 0.45s cubic-bezier(0.22, 0.9, 0.3, 1);
     }
   </style>
+  <script>
+    // ============================================================
+    // 留言板雲端設定(Firebase Realtime Database)
+    // 填入你的 Firebase 專案設定後,所有訪客都能看到彼此的留言。
+    // 保持 null 則留言只存在各自的瀏覽器中(本機模式)。
+    // 範例:
+    // const FIREBASE_CONFIG = {
+    //   apiKey: "AIzaSy...",
+    //   authDomain: "quincy-portal.firebaseapp.com",
+    //   databaseURL: "https://quincy-portal-default-rtdb.asia-southeast1.firebasedatabase.app",
+    //   projectId: "quincy-portal"
+    // };
+    // ============================================================
+    const FIREBASE_CONFIG = {
+      databaseURL: "https://quincy-portal-default-rtdb.firebaseio.com"
+    };
+  </script>
+  <!-- Firebase(留言板雲端同步;未填設定時自動退回本機模式) -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
 </head>
 <body class="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 relative overflow-x-hidden flex flex-col justify-between">
 
@@ -136,37 +185,29 @@
       <span>QUINCY PORTAL</span>
     </div>
     
-    <div class="flex items-center gap-3">
-      <!-- Settings Trigger -->
-      <button
-        id="settings-toggle-btn"
-        onclick="openSettings()"
-        class="p-2 rounded-full hover:bg-neutral-200 dark:hover:bg-neutral-900 transition-colors text-neutral-500 dark:text-neutral-400"
-        title="編輯網頁連結與資訊"
-      >
-        <i data-lucide="settings" class="w-[18px] h-[18px]"></i>
-      </button>
-
-      <!-- Theme Toggle -->
-      <button
-        id="theme-toggle-btn"
-        onclick="toggleTheme()"
-        class="p-2 rounded-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm hover:scale-105 transition-all text-neutral-600 dark:text-neutral-300"
-        aria-label="Toggle Dark Mode"
-      >
-        <i id="theme-icon" data-lucide="sun" class="text-amber-400 w-[18px] h-[18px]"></i>
-      </button>
-    </div>
   </header>
 
   <!-- Main Content Card Container -->
-  <main class="relative max-w-4xl mx-auto w-full px-6 py-8 flex-1 flex items-center justify-center z-10">
+  <main class="relative max-w-4xl mx-auto w-full px-6 py-8 flex-1 flex flex-col items-center justify-center gap-5 z-10">
     
     <!-- Toast Alert -->
     <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-white font-sans text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 transform -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
       <i data-lucide="check" class="w-3.5 h-3.5"></i>
       <span id="toast-message">網頁資訊與個人連結已更新！</span>
     </div>
+
+    <!-- Theme Toggle (膠囊開關：左 Light / 右 Dark) -->
+    <button
+      id="theme-toggle-btn"
+      onclick="toggleTheme()"
+      aria-label="切換深淺色主題"
+      title="往左：淺色模式 / 往右：深色模式"
+      class="relative w-[88px] h-[44px] rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-900 shadow-inner transition-colors duration-300 hover:border-neutral-300 dark:hover:border-neutral-600 shrink-0"
+    >
+      <i data-lucide="sun" class="absolute left-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400 pointer-events-none"></i>
+      <i data-lucide="moon" class="absolute right-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-indigo-300 pointer-events-none"></i>
+      <span id="theme-knob"></span>
+    </button>
 
     <!-- Main visual card board -->
     <div class="w-full bg-white dark:bg-neutral-900/60 border border-neutral-200/60 dark:border-neutral-850 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 backdrop-blur-md">
@@ -667,171 +708,6 @@
     </div>
   </div>
 
-  <!-- Settings Configuration Modal -->
-  <div id="settings-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-xs opacity-0 pointer-events-none transition-all duration-300">
-    <div class="relative w-full max-w-lg bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-2xl border border-neutral-100 dark:border-neutral-800 text-left transform scale-95 transition-all duration-300 max-h-[90vh] overflow-y-auto custom-scrollbar">
-      
-      <!-- Close button -->
-      <button
-        onclick="closeSettings()"
-        class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
-      >
-        <i data-lucide="x" class="w-4 h-4"></i>
-      </button>
-
-      <div class="mb-5 flex items-center gap-2">
-        <i data-lucide="settings" class="text-neutral-500 w-5 h-5"></i>
-        <h3 class="font-sans font-bold text-lg text-neutral-850 dark:text-neutral-100">
-          編輯網頁與個人連結
-        </h3>
-      </div>
-
-      <!-- Settings Form -->
-      <form onsubmit="saveSettings(event)" class="space-y-4">
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
-            <label for="input-name" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
-              NAME / 姓名
-            </label>
-            <input
-              id="input-name"
-              type="text"
-              required
-              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-            />
-          </div>
-
-          <div>
-            <label for="input-location" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
-              LOCATION / 居住地
-            </label>
-            <input
-              id="input-location"
-              type="text"
-              required
-              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-            />
-          </div>
-        </div>
-
-        <div>
-          <label for="input-bio" class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold mb-1">
-            SUBTITLE BIO / 簡介
-          </label>
-          <textarea
-            id="input-bio"
-            required
-            rows="3"
-            class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-2 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors resize-none"
-          ></textarea>
-        </div>
-
-        <div class="h-px bg-neutral-100 dark:bg-neutral-850 my-2"></div>
-
-        <h4 class="font-mono text-[10px] uppercase tracking-widest text-neutral-400 font-bold flex items-center gap-1.5 mb-2">
-          <i data-lucide="link" class="w-3.5 h-3.5"></i>
-          社群連結與 ID (Social Links)
-        </h4>
-
-        <div class="space-y-3">
-          <div>
-            <label for="input-web" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-              個人網頁 / 作品集網址
-            </label>
-            <input
-              id="input-web"
-              type="url"
-              required
-              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-            />
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label for="input-ig" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-                Instagram 網址
-              </label>
-              <input
-                id="input-ig"
-                type="url"
-                required
-                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label for="input-line" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-                LINE ID
-              </label>
-              <input
-                id="input-line"
-                type="text"
-                required
-                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-            <div>
-              <label for="input-fb" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-                Facebook 網址
-              </label>
-              <input
-                id="input-fb"
-                type="url"
-                required
-                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-              />
-            </div>
-
-            <div>
-              <label for="input-threads" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-                Threads 網址
-              </label>
-              <input
-                id="input-threads"
-                type="url"
-                required
-                class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label for="input-logo" class="block font-mono text-[9px] uppercase tracking-wider text-neutral-400 mb-0.5">
-              自訂 Logo 圖片 URL (留空則使用預設黑白手繪極簡 Logo)
-            </label>
-            <input
-              id="input-logo"
-              type="url"
-              placeholder="https://example.com/logo.png"
-              class="w-full font-sans text-xs bg-neutral-50 dark:bg-neutral-950 border border-neutral-200 dark:border-neutral-850 rounded-lg px-3 py-1.5 text-neutral-850 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors"
-            />
-          </div>
-        </div>
-
-        <div class="pt-2 flex gap-3">
-          <button
-            type="button"
-            onclick="closeSettings()"
-            class="flex-1 py-2 px-4 rounded-lg border border-neutral-200 dark:border-neutral-800 text-neutral-700 dark:text-neutral-300 font-sans text-xs font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-950 transition-colors"
-          >
-            取消
-          </button>
-          
-          <button
-            type="submit"
-            class="flex-1 py-2 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black font-sans text-xs font-semibold hover:opacity-90 active:scale-[0.98] transition-all"
-          >
-            確認儲存
-          </button>
-        </div>
-
-      </form>
-    </div>
-  </div>
 
   <script>
     // --- STATE MANAGEMENT ---
@@ -880,7 +756,7 @@
       applyTheme();
       renderProfile();
       renderLinks();
-      renderGuestbook();
+      initGuestbookSync();
       lucide.createIcons();
       // 玻璃膠囊初始定位(不帶動畫)
       requestAnimationFrame(() => movePill(state.activeTab || 'links', false));
@@ -895,33 +771,7 @@
       if (localStorage.getItem('quincy_dark_mode')) {
         state.darkMode = localStorage.getItem('quincy_dark_mode') === 'true';
       }
-      if (localStorage.getItem('quincy_profile_name')) {
-        state.profileName = localStorage.getItem('quincy_profile_name');
-      }
-      if (localStorage.getItem('quincy_profile_location')) {
-        state.profileLocation = localStorage.getItem('quincy_profile_location');
-      }
-      if (localStorage.getItem('quincy_profile_bio')) {
-        state.profileBio = localStorage.getItem('quincy_profile_bio');
-      }
-      if (localStorage.getItem('quincy_web_url')) {
-        state.personalWebUrl = localStorage.getItem('quincy_web_url');
-      }
-      if (localStorage.getItem('quincy_ig_url')) {
-        state.instagramUrl = localStorage.getItem('quincy_ig_url');
-      }
-      if (localStorage.getItem('quincy_line_id')) {
-        state.lineId = localStorage.getItem('quincy_line_id');
-      }
-      if (localStorage.getItem('quincy_fb_url')) {
-        state.facebookUrl = localStorage.getItem('quincy_fb_url');
-      }
-      if (localStorage.getItem('quincy_threads_url')) {
-        state.threadsUrl = localStorage.getItem('quincy_threads_url');
-      }
-      if (localStorage.getItem('quincy_custom_logo')) {
-        state.customLogoUrl = localStorage.getItem('quincy_custom_logo');
-      }
+      // 個人資料固定使用程式碼中的預設值（頁面內容不開放修改）
       
       const savedMessages = localStorage.getItem('quincy_guestbook_messages');
       if (savedMessages) {
@@ -957,23 +807,13 @@
     }
 
     function applyTheme() {
+      // 旋鈕位置由 CSS 的 .dark 選擇器驅動:加上 dark 即滑向右側
       const root = document.documentElement;
-      const themeIcon = document.getElementById('theme-icon');
-      
       if (state.darkMode) {
         root.classList.add('dark');
-        if (themeIcon) {
-          themeIcon.setAttribute('data-lucide', 'sun');
-          themeIcon.className = "text-amber-400 w-[18px] h-[18px]";
-        }
       } else {
         root.classList.remove('dark');
-        if (themeIcon) {
-          themeIcon.setAttribute('data-lucide', 'moon');
-          themeIcon.className = "text-neutral-600 w-[18px] h-[18px]";
-        }
       }
-      lucide.createIcons();
     }
 
     // --- RENDER PROFILE ---
@@ -1095,6 +935,43 @@
       lucide.createIcons();
     }
 
+    // --- GUESTBOOK CLOUD SYNC ---
+    // 每個瀏覽器一組匿名識別碼,用來判斷「自己的留言」才顯示刪除按鈕
+    const CLIENT_TOKEN = (() => {
+      let t = localStorage.getItem('quincy_client_token');
+      if (!t) {
+        t = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('quincy_client_token', t);
+      }
+      return t;
+    })();
+
+    let guestbookDB = null;
+
+    function escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
+
+    function initGuestbookSync() {
+      if (!window.firebase || !FIREBASE_CONFIG) { renderGuestbook(); return; }
+      try {
+        firebase.initializeApp(FIREBASE_CONFIG);
+        guestbookDB = firebase.database();
+        guestbookDB.ref('guestbook').orderByChild('ts').on('value', snap => {
+          const val = snap.val() || {};
+          state.messages = Object.entries(val)
+            .map(([key, m]) => ({ ...m, id: key }))
+            .sort((a, b) => (b.ts || 0) - (a.ts || 0));
+          renderGuestbook();
+        }, () => { guestbookDB = null; renderGuestbook(); });
+      } catch (e) {
+        guestbookDB = null;
+        renderGuestbook();
+      }
+    }
+
     // --- GUESTBOOK ---
     function renderGuestbook() {
       const messagesContainer = document.getElementById('guestbook-messages');
@@ -1112,35 +989,38 @@
         return;
       }
 
-      messagesContainer.innerHTML = state.messages.map(msg => `
+      messagesContainer.innerHTML = state.messages.map(msg => {
+        const canDelete = msg.owner && msg.owner === CLIENT_TOKEN;
+        const safeName = escapeHtml(msg.name || '');
+        const safeMessage = escapeHtml(msg.message || '');
+        return `
         <div class="bg-neutral-50/50 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-neutral-100 dark:border-neutral-900 flex gap-3 group relative hover:border-neutral-200 dark:hover:border-neutral-800 transition-colors">
           <div class="w-9 h-9 rounded-full ${msg.avatarColor} flex items-center justify-center font-sans text-xs font-bold shrink-0 shadow-2xs select-none">
-            ${msg.name.charAt(0).toUpperCase()}
+            ${safeName.charAt(0).toUpperCase()}
           </div>
           <div class="flex-1 min-w-0">
-            <div class="flex items-baseline justify-between mb-0.5">
+            <div class="flex items-baseline justify-between mb-0.5 ${canDelete ? 'pr-6' : ''}">
               <span class="font-sans font-bold text-sm text-neutral-800 dark:text-neutral-200 truncate">
-                ${msg.name}
+                ${safeName}
               </span>
               <span class="font-mono text-[10px] text-neutral-400">
-                ${msg.timestamp}
+                ${msg.timestamp || ''}
               </span>
             </div>
             <p class="font-sans text-sm text-neutral-600 dark:text-neutral-350 leading-relaxed break-words">
-              ${msg.message}
+              ${safeMessage}
             </p>
           </div>
-          
-          <!-- Delete button -->
+          ${canDelete ? `
           <button
             onclick="deleteMessage('${msg.id}')"
-            class="absolute top-3 right-3 p-1 rounded-md opacity-0 group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 text-neutral-400 hover:text-red-500 transition-all"
-            title="刪除留言"
+            class="absolute top-3 right-3 p-1 rounded-md opacity-60 md:opacity-0 md:group-hover:opacity-100 hover:bg-red-50 dark:hover:bg-red-950/30 text-neutral-400 hover:text-red-500 transition-all"
+            title="刪除我的留言"
           >
             <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>
-          </button>
+          </button>` : ''}
         </div>
-      `).join('');
+      `;}).join('');
 
       lucide.createIcons();
     }
@@ -1159,39 +1039,63 @@
       submitBtn.disabled = true;
       submitBtn.innerHTML = `<span class="w-4 h-4 border-2 border-white dark:border-black border-t-transparent rounded-full animate-spin"></span>`;
 
-      setTimeout(() => {
-        const now = new Date();
-        const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
-        
-        const newMsg = {
-          id: Date.now().toString(),
-          name: name,
-          message: message,
-          timestamp: timestamp,
-          avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
-        };
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
 
-        state.messages.unshift(newMsg);
-        saveStateToStorage();
-        renderGuestbook();
+      const newMsg = {
+        name: name,
+        message: message,
+        timestamp: timestamp,
+        ts: Date.now(),
+        owner: CLIENT_TOKEN,
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
+      };
 
+      const finish = (toastText) => {
         nameInput.value = '';
         messageInput.value = '';
         document.getElementById('char-count').textContent = '0';
-
         submitBtn.disabled = false;
         submitBtn.innerHTML = `<i data-lucide="send" class="w-3 h-3"></i><span>送出留言</span>`;
         lucide.createIcons();
+        showToast(toastText);
+      };
 
-        showToast("留言成功送出！已儲存於瀏覽器中。");
-      }, 400);
+      if (guestbookDB) {
+        // 雲端模式:寫入 Firebase,所有訪客即時同步(渲染交給 on('value') 監聽)
+        guestbookDB.ref('guestbook').push(newMsg)
+          .then(() => finish("留言成功送出！所有訪客都看得到。"))
+          .catch(() => {
+            submitBtn.disabled = false;
+            submitBtn.innerHTML = `<i data-lucide="send" class="w-3 h-3"></i><span>送出留言</span>`;
+            lucide.createIcons();
+            showToast("送出失敗，請檢查網路後再試一次。");
+          });
+      } else {
+        // 本機模式
+        newMsg.id = Date.now().toString();
+        state.messages.unshift(newMsg);
+        saveStateToStorage();
+        renderGuestbook();
+        finish("留言成功送出！（目前為本機模式，僅儲存於此瀏覽器）");
+      }
     }
 
     function deleteMessage(id) {
-      state.messages = state.messages.filter(m => m.id !== id);
-      saveStateToStorage();
-      renderGuestbook();
-      showToast("留言已刪除。");
+      const msg = state.messages.find(m => m.id === id);
+      if (!msg || msg.owner !== CLIENT_TOKEN) return; // 只能刪除自己的留言
+      if (!confirm('確定要刪除這則留言嗎？')) return;
+
+      if (guestbookDB) {
+        guestbookDB.ref('guestbook/' + id).remove()
+          .then(() => showToast("留言已刪除。"))
+          .catch(() => showToast("刪除失敗，請稍後再試。"));
+      } else {
+        state.messages = state.messages.filter(m => m.id !== id);
+        saveStateToStorage();
+        renderGuestbook();
+        showToast("留言已刪除。");
+      }
     }
 
     function updateCharCount(textarea) {
@@ -1232,50 +1136,7 @@
       } catch (err) {}
     }
 
-    function openSettings() {
-      // Load current fields
-      document.getElementById('input-name').value = state.profileName;
-      document.getElementById('input-location').value = state.profileLocation;
-      document.getElementById('input-bio').value = state.profileBio;
-      document.getElementById('input-web').value = state.personalWebUrl;
-      document.getElementById('input-ig').value = state.instagramUrl;
-      document.getElementById('input-line').value = state.lineId;
-      document.getElementById('input-fb').value = state.facebookUrl;
-      document.getElementById('input-threads').value = state.threadsUrl;
-      document.getElementById('input-logo').value = state.customLogoUrl || '';
 
-      const modal = document.getElementById('settings-modal');
-      modal.classList.remove('pointer-events-none', 'opacity-0');
-      modal.querySelector('div').classList.remove('scale-95');
-      modal.querySelector('div').classList.add('scale-100');
-    }
-
-    function closeSettings() {
-      const modal = document.getElementById('settings-modal');
-      modal.classList.add('pointer-events-none', 'opacity-0');
-      modal.querySelector('div').classList.add('scale-95');
-      modal.querySelector('div').classList.remove('scale-100');
-    }
-
-    function saveSettings(e) {
-      e.preventDefault();
-      
-      state.profileName = document.getElementById('input-name').value;
-      state.profileLocation = document.getElementById('input-location').value;
-      state.profileBio = document.getElementById('input-bio').value;
-      state.personalWebUrl = document.getElementById('input-web').value;
-      state.instagramUrl = document.getElementById('input-ig').value;
-      state.lineId = document.getElementById('input-line').value;
-      state.facebookUrl = document.getElementById('input-fb').value;
-      state.threadsUrl = document.getElementById('input-threads').value;
-      state.customLogoUrl = document.getElementById('input-logo').value.trim();
-
-      saveStateToStorage();
-      renderProfile();
-      renderLinks();
-      closeSettings();
-      showToast("網頁資訊與個人連結已更新！");
-    }
 
     // --- TOAST ALERT ---
     function showToast(message) {
