@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="zh-TW" class="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="description" content="QUINCY PORTAL - 個人名片入口 | 社群連結、留言板與關於我">
+  <meta property="og:title" content="QUINCY PORTAL - 個人名片入口">
+  <meta property="og:type" content="website">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0a0a0a">
+  <title>QUINCY PORTAL - 個人名片入口</title>
+
+  <link rel="icon" href="favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'sans-serif'],
+            mono: ['JetBrains Mono', 'ui-monospace', 'SFMono-Regular', 'monospace'],
+            display: ['Space Grotesk', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <style>
+    :root {
+      --mx: 50vw;
+      --my: 30vh;
+      --tilt-x: 0deg;
+      --tilt-y: 0deg;
+      --logo-x: 0px;
+      --logo-y: 0px;
+      --logo-r: 0deg;
+    }
+
+    html { scroll-behavior: smooth; }
+    body { min-height: 100vh; }
+
+    .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: rgba(156,163,175,.3);
+      border-radius: 9999px;
+    }
+    .dark .custom-scrollbar::-webkit-scrollbar-thumb { background: rgba(75,85,99,.45); }
+
+    /* ambient interactive spotlight */
+    #ambient-spotlight {
+      position: fixed;
+      inset: 0;
+      pointer-events: none;
+      z-index: 0;
+      background:
+        radial-gradient(540px circle at var(--mx) var(--my),
+          rgba(255,255,255,.13),
+          rgba(255,255,255,.045) 28%,
+          transparent 62%);
+      opacity: .82;
+      transition: opacity .35s ease;
+    }
+    html:not(.dark) #ambient-spotlight {
+      background:
+        radial-gradient(560px circle at var(--mx) var(--my),
+          rgba(0,0,0,.055),
+          rgba(0,0,0,.018) 30%,
+          transparent 64%);
+      opacity: .72;
+    }
+
+    .ambient-orb {
+      position: fixed;
+      width: 34rem;
+      height: 34rem;
+      border-radius: 9999px;
+      filter: blur(90px);
+      opacity: .10;
+      pointer-events: none;
+      z-index: 0;
+      animation: orb-drift 15s ease-in-out infinite alternate;
+    }
+    .orb-a { left: -12rem; top: 7rem; background: #60a5fa; }
+    .orb-b { right: -15rem; bottom: 0; background: #a78bfa; animation-delay: -7s; }
+    .dark .ambient-orb { opacity: .12; }
+    @keyframes orb-drift {
+      from { transform: translate3d(0,0,0) scale(1); }
+      to { transform: translate3d(2.6rem,-2rem,0) scale(1.08); }
+    }
+
+    /* entrance */
+    .reveal {
+      opacity: 0;
+      transform: translateY(14px) scale(.99);
+      filter: blur(7px);
+    }
+    .is-ready .reveal {
+      animation: reveal-in .72s cubic-bezier(.2,.8,.2,1) forwards;
+      animation-delay: var(--delay, 0ms);
+    }
+    @keyframes reveal-in {
+      to { opacity: 1; transform: translateY(0) scale(1); filter: blur(0); }
+    }
+
+    /* main board tilt */
+    #portal-board-wrap {
+      perspective: 1200px;
+      width: 100%;
+    }
+    #portal-board {
+      transform: rotateX(var(--tilt-x)) rotateY(var(--tilt-y));
+      transform-style: preserve-3d;
+      transition: transform .16s ease-out, box-shadow .35s ease, border-color .35s ease;
+      will-change: transform;
+    }
+    #portal-board.is-settling { transition: transform .6s cubic-bezier(.2,.8,.2,1); }
+    #portal-board:hover {
+      box-shadow:
+        0 30px 80px rgba(0,0,0,.12),
+        0 8px 22px rgba(0,0,0,.08);
+    }
+    .dark #portal-board:hover {
+      box-shadow:
+        0 32px 92px rgba(0,0,0,.46),
+        0 10px 28px rgba(0,0,0,.28);
+    }
+
+    /* logo motion */
+    #logo-container {
+      transform: translate3d(var(--logo-x), var(--logo-y), 0) rotate(var(--logo-r));
+      transition: transform .16s ease-out;
+      will-change: transform;
+      position: relative;
+    }
+    #logo-container::after {
+      content: "";
+      position: absolute;
+      inset: 17%;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(255,255,255,.18), transparent 68%);
+      filter: blur(20px);
+      opacity: 0;
+      transition: opacity .35s ease;
+      pointer-events: none;
+    }
+    #logo-container:hover::after { opacity: 1; }
+    #default-logo-img {
+      transition: transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
+    }
+    #logo-container:hover #default-logo-img { transform: scale(1.035); }
+
+    /* interactive cards */
+    .interactive-card {
+      position: relative;
+      overflow: hidden;
+      isolation: isolate;
+      --cx: 50%;
+      --cy: 50%;
+    }
+    .interactive-card::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: -1;
+      background: radial-gradient(240px circle at var(--cx) var(--cy),
+        rgba(255,255,255,.26),
+        transparent 58%);
+      opacity: 0;
+      transition: opacity .25s ease;
+    }
+    .dark .interactive-card::before {
+      background: radial-gradient(240px circle at var(--cx) var(--cy),
+        rgba(255,255,255,.09),
+        transparent 62%);
+    }
+    .interactive-card:hover::before { opacity: 1; }
+    .interactive-card {
+      transform: translate3d(0,0,0);
+      transition:
+        transform .28s cubic-bezier(.2,.8,.2,1),
+        border-color .28s ease,
+        background-color .28s ease,
+        box-shadow .28s ease;
+    }
+    .interactive-card:hover {
+      transform: translate3d(0,-4px,0) scale(1.006);
+      box-shadow: 0 14px 34px rgba(0,0,0,.08);
+    }
+    .dark .interactive-card:hover { box-shadow: 0 16px 38px rgba(0,0,0,.24); }
+    .interactive-card:active { transform: scale(.985); }
+
+    /* liquid glass tabs */
+    #glass-pill {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      left: 0;
+      width: 0;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,.94), rgba(255,255,255,.61));
+      backdrop-filter: blur(16px) saturate(170%);
+      -webkit-backdrop-filter: blur(16px) saturate(170%);
+      border: 1px solid rgba(255,255,255,.72);
+      box-shadow: 0 6px 18px rgba(0,0,0,.10), inset 0 1px 0 rgba(255,255,255,.95);
+      transition:
+        left .55s cubic-bezier(.30,1.60,.36,1),
+        width .55s cubic-bezier(.30,1.60,.36,1),
+        transform .35s ease,
+        background .3s ease;
+      will-change: left, width, transform;
+      pointer-events: none;
+      z-index: 0;
+      overflow: hidden;
+    }
+    .dark #glass-pill {
+      background: linear-gradient(135deg, rgba(255,255,255,.17), rgba(255,255,255,.06));
+      border-color: rgba(255,255,255,.20);
+      box-shadow: 0 6px 18px rgba(0,0,0,.40), inset 0 1px 0 rgba(255,255,255,.28);
+    }
+    #tab-bar.is-moving #glass-pill { transform: scaleY(.86) scaleX(1.05); }
+    #glass-pill::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: inherit;
+      background: linear-gradient(115deg, transparent 32%, rgba(255,255,255,.55) 50%, transparent 68%);
+      opacity: 0;
+      transform: translateX(-60%);
+    }
+    #tab-bar.is-moving #glass-pill::after { animation: pill-shine .55s ease-out; }
+    @keyframes pill-shine {
+      0% { opacity: 0; transform: translateX(-60%); }
+      45% { opacity: .9; }
+      100% { opacity: 0; transform: translateX(60%); }
+    }
+
+    #theme-knob {
+      position: absolute;
+      top: 3px;
+      left: 4px;
+      width: 36px;
+      height: 36px;
+      border-radius: 9999px;
+      background: linear-gradient(135deg, rgba(255,255,255,.96), rgba(255,255,255,.68));
+      border: 1px solid rgba(255,255,255,.75);
+      box-shadow: 0 2px 6px rgba(0,0,0,.16), inset 0 1px 0 rgba(255,255,255,.95);
+      backdrop-filter: blur(8px) saturate(160%);
+      -webkit-backdrop-filter: blur(8px) saturate(160%);
+      transform: translateX(0);
+      transition: transform .45s cubic-bezier(.30,1.60,.36,1), background .3s ease;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .dark #theme-knob {
+      transform: translateX(44px);
+      background: linear-gradient(135deg, rgba(255,255,255,.30), rgba(255,255,255,.10));
+      border-color: rgba(255,255,255,.28);
+      box-shadow: 0 2px 8px rgba(0,0,0,.50), inset 0 1px 0 rgba(255,255,255,.32);
+    }
+
+    @keyframes glass-in {
+      from { opacity: 0; filter: blur(12px); transform: translateY(9px) scale(.985); }
+      to { opacity: 1; filter: blur(0); transform: translateY(0) scale(1); }
+    }
+    .tab-enter { animation: glass-in .48s cubic-bezier(.22,.9,.3,1); }
+
+    /* tiny floating detail */
+    .status-dot {
+      box-shadow: 0 0 0 0 rgba(16,185,129,.35);
+      animation: status-pulse 2.4s ease-out infinite;
+    }
+    @keyframes status-pulse {
+      0% { box-shadow: 0 0 0 0 rgba(16,185,129,.35); }
+      70% { box-shadow: 0 0 0 7px rgba(16,185,129,0); }
+      100% { box-shadow: 0 0 0 0 rgba(16,185,129,0); }
+    }
+
+    @media (hover: none), (pointer: coarse) {
+      #portal-board { transform: none !important; }
+      .interactive-card:hover { transform: none; }
+      #ambient-spotlight { display: none; }
+      #logo-container { transform: none !important; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: .01ms !important;
+      }
+      #portal-board, #logo-container { transform: none !important; }
+      .reveal { opacity: 1 !important; transform: none !important; filter: none !important; }
+    }
+
+
+    /* ===== CINEMATIC / MAX INTERACTION UPGRADE ===== */
+    #intro-gate {
+      position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center;
+      background: #050505; color: #fff; pointer-events: none;
+      animation: introGate 1.65s cubic-bezier(.76,0,.24,1) forwards;
+    }
+    #intro-gate .intro-word {
+      font-family: 'Space Grotesk', sans-serif; font-weight: 600; letter-spacing: .18em;
+      font-size: clamp(1.3rem,4vw,2.6rem); text-transform: none;
+      opacity: 0; transform: translateY(16px) scale(.94); filter: blur(12px);
+      animation: introWord 1.1s .08s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    #intro-gate .intro-line {
+      position: absolute; left: 50%; top: calc(50% + 42px); width: min(280px,56vw); height: 1px;
+      transform: translateX(-50%) scaleX(0); transform-origin: center;
+      background: linear-gradient(90deg,transparent,rgba(255,255,255,.95),transparent);
+      animation: introLine 1.05s .18s cubic-bezier(.16,1,.3,1) forwards;
+    }
+    @keyframes introWord { 55%,100% { opacity:1; transform:translateY(0) scale(1); filter:blur(0); } }
+    @keyframes introLine { 55%,100% { transform:translateX(-50%) scaleX(1); } }
+    @keyframes introGate {
+      0%,68% { opacity:1; clip-path:inset(0 0 0 0); }
+      100% { opacity:0; clip-path:inset(0 0 100% 0); visibility:hidden; }
+    }
+
+    #cursor-core, #cursor-ring {
+      position: fixed; left: 0; top: 0; z-index: 9998; border-radius: 999px;
+      pointer-events: none; opacity: 0; mix-blend-mode: difference;
+    }
+    #cursor-core { width:6px; height:6px; background:white; margin:-3px 0 0 -3px; }
+    #cursor-ring { width:34px; height:34px; border:1px solid rgba(255,255,255,.72); margin:-17px 0 0 -17px; transition:width .22s,height .22s,margin .22s,opacity .2s,border-color .2s; }
+    body.cursor-live #cursor-core, body.cursor-live #cursor-ring { opacity:.9; }
+    body.cursor-hot #cursor-ring { width:54px; height:54px; margin:-27px 0 0 -27px; border-color:rgba(255,255,255,.95); }
+
+    #trail-layer { position:fixed; inset:0; pointer-events:none; z-index:4; overflow:hidden; }
+    .trail-star { position:absolute; width:4px; height:4px; border-radius:50%; background:currentColor; color:rgba(255,255,255,.68); animation:trailPop .7s ease-out forwards; }
+    html:not(.dark) .trail-star { color:rgba(0,0,0,.33); }
+    @keyframes trailPop { 0%{opacity:.85;transform:translate(-50%,-50%) scale(1)} 100%{opacity:0;transform:translate(-50%,-50%) scale(.1) translateY(16px)} }
+
+    #portal-board-wrap { position:relative; }
+    #portal-board-wrap::before {
+      content:""; position:absolute; inset:-18px; border-radius:2.25rem; z-index:-1; opacity:.52;
+      background:conic-gradient(from var(--halo-angle,0deg), transparent 0 12%, rgba(96,165,250,.28), transparent 30% 48%, rgba(167,139,250,.26), transparent 66% 82%, rgba(52,211,153,.16), transparent);
+      filter:blur(24px); animation:haloSpin 10s linear infinite;
+    }
+    @property --halo-angle { syntax:'<angle>'; inherits:false; initial-value:0deg; }
+    @keyframes haloSpin { to { --halo-angle:360deg; } }
+
+    #portal-board::after {
+      content:""; position:absolute; inset:0; pointer-events:none; border-radius:inherit; z-index:20;
+      background:linear-gradient(115deg, transparent 28%, rgba(255,255,255,.12) 44%, transparent 58%);
+      transform:translateX(-120%); opacity:0;
+    }
+    #portal-board:hover::after { opacity:1; animation:boardSweep 1.05s ease-out; }
+    @keyframes boardSweep { to { transform:translateX(120%); } }
+
+    #logo-container { transform-style:preserve-3d; }
+    #logo-container::before {
+      content:""; position:absolute; inset:2%; border:1px solid rgba(148,163,184,.24); border-radius:50%;
+      animation:logoOrbit 9s linear infinite; pointer-events:none;
+    }
+    #logo-container .orbit-dot { position:absolute; width:7px; height:7px; border-radius:50%; background:currentColor; color:#fff; box-shadow:0 0 18px currentColor; z-index:3; }
+    #logo-container .dot-a { left:50%; top:0; animation:orbitA 5.5s ease-in-out infinite alternate; }
+    #logo-container .dot-b { right:7%; bottom:19%; width:4px; height:4px; animation:orbitB 4.2s ease-in-out infinite alternate; }
+    html:not(.dark) #logo-container .orbit-dot { color:#111827; }
+    @keyframes logoOrbit { to{transform:rotate(360deg)} }
+    @keyframes orbitA { to{transform:translate3d(-34px,20px,40px) scale(1.5)} }
+    @keyframes orbitB { to{transform:translate3d(-22px,-24px,30px) scale(.7)} }
+
+    .interactive-card { transform-style:preserve-3d; --rx:0deg; --ry:0deg; --magx:0px; --magy:0px; }
+    .interactive-card:hover { transform:translate3d(var(--magx),calc(var(--magy) - 5px),0) rotateX(var(--rx)) rotateY(var(--ry)) scale(1.012); }
+    .interactive-card::after {
+      content:""; position:absolute; inset:-60%; pointer-events:none; z-index:5;
+      background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.30) 50%,transparent 60%);
+      transform:translateX(-50%) rotate(8deg); opacity:0; transition:opacity .2s;
+    }
+    .interactive-card:hover::after { opacity:.65; animation:cardShine .78s ease-out; }
+    @keyframes cardShine { to{transform:translateX(50%) rotate(8deg)} }
+
+    .click-ripple { position:absolute; border-radius:50%; pointer-events:none; z-index:30; width:10px; height:10px; background:rgba(255,255,255,.46); transform:translate(-50%,-50%) scale(0); animation:ripple .62s ease-out forwards; }
+    html:not(.dark) .click-ripple { background:rgba(0,0,0,.16); }
+    @keyframes ripple { to{transform:translate(-50%,-50%) scale(20);opacity:0} }
+
+    #theme-toggle-btn:hover { transform:translateY(-2px) scale(1.04); box-shadow:0 12px 28px rgba(0,0,0,.12); }
+    #theme-toggle-btn:active { transform:scale(.96); }
+    #theme-toggle-btn { transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .3s, background-color .3s; }
+
+    .tab-btn i { transition:transform .35s cubic-bezier(.16,1,.3,1); }
+    .tab-btn:hover i { transform:translateY(-2px) rotate(-7deg) scale(1.12); }
+
+    @media (hover:none),(pointer:coarse) {
+      #cursor-core,#cursor-ring,#trail-layer { display:none!important; }
+      #portal-board-wrap::before { opacity:.28; animation-duration:16s; }
+      .interactive-card:hover { transform:none; }
+    }
+    @media (prefers-reduced-motion:reduce) {
+      #intro-gate { display:none!important; }
+      #cursor-core,#cursor-ring,#trail-layer { display:none!important; }
+    }
+
+  </style>
+
+  <script>
+    const FIREBASE_CONFIG = {
+      databaseURL: "https://quincy-portal-default-rtdb.firebaseio.com"
+    };
+  </script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.1/firebase-database-compat.js"></script>
+</head>
+
+<body class="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 relative overflow-x-hidden flex flex-col">
+  <div id="intro-gate" aria-hidden="true"><div class="intro-word">qVsion</div><div class="intro-line"></div></div>
+  <div id="cursor-core" aria-hidden="true"></div><div id="cursor-ring" aria-hidden="true"></div><div id="trail-layer" aria-hidden="true"></div>
+  <div class="fixed inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] pointer-events-none z-0"></div>
+  <div class="ambient-orb orb-a"></div>
+  <div class="ambient-orb orb-b"></div>
+  <div id="ambient-spotlight"></div>
+
+  <header class="relative max-w-6xl mx-auto w-full px-6 py-4 flex justify-between items-center z-10 reveal" style="--delay:60ms">
+    <div class="flex items-center gap-2 font-mono text-xs text-neutral-400 uppercase tracking-wider font-semibold">
+      <i data-lucide="sparkles" class="text-amber-500 w-3.5 h-3.5"></i>
+      <span>QUINCY PORTAL</span>
+    </div>
+    <div class="hidden sm:flex items-center gap-2 text-[10px] font-mono text-neutral-400 uppercase tracking-widest">
+      <span class="status-dot w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+      <span>Interactive / 2026</span>
+    </div>
+  </header>
+
+  <main class="relative max-w-4xl mx-auto w-full px-6 py-8 flex-1 flex flex-col items-center justify-center gap-5 z-10">
+    <div id="toast" class="fixed top-6 left-1/2 -translate-x-1/2 z-50 bg-emerald-500 text-white font-sans text-xs font-semibold px-4 py-2.5 rounded-full shadow-lg flex items-center gap-2 -translate-y-20 opacity-0 transition-all duration-300 pointer-events-none">
+      <i data-lucide="check" class="w-3.5 h-3.5"></i>
+      <span id="toast-message">完成</span>
+    </div>
+
+    <button
+      id="theme-toggle-btn"
+      type="button"
+      aria-label="切換深淺色主題"
+      title="淺色 / 深色模式"
+      class="relative w-[88px] h-[44px] rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/90 dark:bg-neutral-900/90 shadow-inner transition-colors duration-300 hover:border-neutral-300 dark:hover:border-neutral-600 shrink-0 reveal"
+      style="--delay:120ms"
+    >
+      <i data-lucide="sun" class="absolute left-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400 pointer-events-none"></i>
+      <i data-lucide="moon" class="absolute right-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-indigo-300 pointer-events-none"></i>
+      <span id="theme-knob"></span>
+    </button>
+
+    <div id="portal-board-wrap" class="reveal" style="--delay:180ms">
+      <div id="portal-board" class="w-full bg-white/90 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800/80 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 backdrop-blur-xl">
+        <section class="md:col-span-5 bg-neutral-50/60 dark:bg-neutral-900/35 p-8 flex flex-col justify-between items-center text-center border-b md:border-b-0 md:border-r border-neutral-200/60 dark:border-neutral-800/80">
+          <div class="w-full flex flex-col items-center md:-mt-2">
+            <div class="w-full text-left hidden md:block mb-6">
+              <span class="font-mono text-[10px] text-neutral-400 tracking-widest block mb-1">qVsion</span>
+              <div class="h-[2px] w-8 bg-neutral-900 dark:bg-white transition-colors"></div>
+            </div>
+
+            <div class="my-4 md:my-0 flex flex-col items-center">
+              <div id="logo-container" class="w-52 h-52 md:w-64 md:h-64 flex items-center justify-center"><span class="orbit-dot dot-a"></span><span class="orbit-dot dot-b"></span>
+                <img id="default-logo-img" src="assets/qlogo.png" alt="Quincy Logo" class="w-full h-full object-contain invert dark:invert-0 select-none drop-shadow-sm">
+              </div>
+
+              <div class="mt-4 flex flex-col items-center max-w-[320px] px-2 text-center select-none">
+                <p class="font-sans text-xs italic text-neutral-600 dark:text-neutral-400 leading-normal tracking-wide">
+                  "One must still have chaos in oneself, to give birth to a dancing star."
+                </p>
+                <p class="font-sans text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 leading-normal">
+                  「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」
+                </p>
+                <span class="font-mono text-[10px] text-neutral-500 mt-1 uppercase tracking-widest">— Nietzsche</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="space-y-4 w-full mt-7 md:mt-3">
+            <div>
+              <h1 id="profile-name" class="font-sans font-semibold text-2xl md:text-3xl tracking-tight text-neutral-900 dark:text-white max-w-full px-2 leading-tight"></h1>
+              <div class="flex items-center justify-center gap-1.5 text-neutral-500 dark:text-neutral-400 text-sm mt-1">
+                <i data-lucide="map-pin" class="w-3.5 h-3.5"></i>
+                <span id="profile-location" class="font-sans"></span>
+              </div>
+            </div>
+
+            <p id="profile-bio" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed px-4 max-w-sm mx-auto"></p>
+
+            <div class="pt-2">
+              <a href="mailto:quincychen0313@gmail.com" class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-neutral-100 dark:bg-neutral-800 text-xs font-mono text-neutral-500 dark:text-neutral-400 uppercase hover:bg-neutral-200 dark:hover:bg-neutral-700 hover:text-neutral-800 dark:hover:text-neutral-200 transition-all duration-300 shadow-sm hover:scale-[1.02]">
+                <i data-lucide="mail" class="w-3 h-3"></i>
+                <span>quincychen0313@gmail.com</span>
+              </a>
+            </div>
+          </div>
+        </section>
+
+        <section class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-between min-w-0">
+          <div class="mb-6">
+            <div id="tab-bar" class="relative inline-flex items-center gap-1 p-1.5 rounded-full bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200/70 dark:border-neutral-700/50 shadow-inner">
+              <div id="glass-pill"></div>
+              <button id="tab-btn-links" data-tab="links" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-semibold text-neutral-900 dark:text-white transition-colors duration-300">
+                <i data-lucide="globe" class="w-4 h-4"></i><span>社群連結</span>
+              </button>
+              <button id="tab-btn-guestbook" data-tab="guestbook" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300">
+                <i data-lucide="message-square" class="w-4 h-4"></i><span>留言板</span>
+              </button>
+              <button id="tab-btn-about" data-tab="about" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300">
+                <i data-lucide="info" class="w-4 h-4"></i><span>關於我</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="h-[520px] md:h-[600px] min-w-0">
+            <div id="tab-content-links" class="tab-content h-full overflow-y-auto custom-scrollbar pr-2 space-y-4">
+              <!-- Website -->
+              <a id="website-link" href="https://quincychen0313.github.io" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-100 dark:bg-neutral-800 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-2 rounded-xl bg-neutral-900 shadow-sm group-hover:scale-105 transition-transform shrink-0">
+                    <img src="favicon-64.png" alt="Quincy Logo" class="w-8 h-8 object-contain select-none">
+                  </div>
+                  <div class="min-w-0">
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">個人網頁入口 / 作品集</span>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">quincychen0313.github.io</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">探索更多設計專案與數位產品作品集</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- Instagram -->
+              <a href="https://www.instagram.com/quincychen/" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-pink-100 dark:border-pink-900/30 bg-pink-50 dark:bg-pink-950/20 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-pink-400 shrink-0">
+                    <svg viewBox="0 0 24 24" class="w-6 h-6 fill-current" aria-hidden="true"><path d="M7.0301.084c-1.2768.0602-2.1487.264-2.911.5634-.7888.3075-1.4575.72-2.1228 1.3877-.6652.6677-1.075 1.3368-1.3802 2.127-.2954.7638-.4956 1.6365-.552 2.914-.0564 1.2775-.0689 1.6882-.0626 4.947.0062 3.2586.0206 3.6671.0825 4.9473.061 1.2765.264 2.1482.5635 2.9107.308.7889.72 1.4573 1.388 2.1228.6679.6655 1.3365 1.0743 2.1285 1.38.7632.295 1.6361.4961 2.9134.552 1.2773.056 1.6884.069 4.9462.0627 3.2578-.0062 3.668-.0207 4.9478-.0814 1.28-.0607 2.147-.2652 2.9098-.5633.7889-.3086 1.4578-.72 2.1228-1.3881.665-.6682 1.0745-1.3378 1.3795-2.1284.2957-.7632.4966-1.636.552-2.9124.056-1.2809.0692-1.6898.063-4.948-.0063-3.2583-.021-3.6668-.0817-4.9465-.0607-1.2797-.264-2.1487-.5633-2.9117-.3084-.7889-.72-1.4568-1.3876-2.1228C21.2982 1.33 20.628.9208 19.8378.6165 19.074.321 18.2017.1197 16.9244.0645 15.6471.0093 15.236-.005 11.977.0014 8.718.0076 8.31.0215 7.0301.0839m.1402 21.6932c-1.17-.0509-1.8053-.2453-2.2287-.408-.5606-.216-.96-.4771-1.3819-.895-.422-.4178-.6811-.8186-.9-1.378-.1644-.4234-.3624-1.058-.4171-2.228-.0595-1.2645-.072-1.6442-.079-4.848-.007-3.2037.0053-3.583.0607-4.848.05-1.169.2456-1.805.408-2.2282.216-.5613.4762-.96.895-1.3816.4188-.4217.8184-.6814 1.3783-.9003.423-.1651 1.0575-.3614 2.227-.4171 1.2655-.06 1.6447-.072 4.848-.079 3.2033-.007 3.5835.005 4.8495.0608 1.169.0508 1.8053.2445 2.228.408.5608.216.96.4754 1.3816.895.4217.4194.6816.8176.9005 1.3787.1653.4217.3617 1.056.4169 2.2263.0602 1.2655.0739 1.645.0796 4.848.0058 3.203-.0055 3.5834-.061 4.848-.051 1.17-.245 1.8055-.408 2.2294-.216.5604-.4763.96-.8954 1.3814-.419.4215-.8181.6811-1.3783.9-.4224.1649-1.0577.3617-2.2262.4174-1.2656.0595-1.6448.072-4.8493.079-3.2045.007-3.5825-.006-4.848-.0608M16.953 5.5864A1.44 1.44 0 1 0 18.39 4.144a1.44 1.44 0 0 0-1.437 1.4424M5.8385 12.012c.0067 3.4032 2.7706 6.1557 6.173 6.1493 3.4026-.0065 6.157-2.7701 6.1506-6.1733-.0065-3.4032-2.771-6.1565-6.174-6.1498-3.403.0067-6.156 2.771-6.1496 6.1738M8 12.0077a4 4 0 1 1 4.008 3.9921A3.9996 3.9996 0 0 1 8 12.0077"/></svg>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Instagram</span>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">生活日常、攝影作品與美學設計點滴</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- Facebook -->
+              <a href="https://www.facebook.com/quincychen0313" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/20 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-blue-400 shrink-0">
+                    <span class="w-6 h-6 flex items-center justify-center font-bold text-xl leading-none">f</span>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Facebook</span>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">Quincy Chen</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">專業文章、設計觀點與趨勢分享</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- Threads -->
+              <a href="https://www.threads.net/@quincychen0313" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-neutral-200 dark:border-neutral-800 bg-neutral-100/60 dark:bg-neutral-900/50 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-neutral-100 shrink-0">
+                    <span class="w-6 h-6 flex items-center justify-center font-bold text-lg">@</span>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Threads</span>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Threads 社群分享、生活碎念與日常互動</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- FaceTime -->
+              <a href="facetime-audio://+886917080313" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-green-100 dark:border-green-900/30 bg-green-50 dark:bg-green-950/20 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-green-400 shrink-0">
+                    <i data-lucide="video" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">FaceTime</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Apple 裝置直撥語音通話，即刻對談</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- LINE -->
+              <button id="line-open-btn" type="button" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-[#06C755]/20 bg-[#06C755]/10 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-[#06C755] shrink-0">
+                    <i data-lucide="message-circle" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <div class="flex items-center gap-1.5">
+                      <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">LINE 聯絡我</span>
+                      <span class="inline-flex px-1.5 py-0.5 rounded-full bg-[#06C755]/20 text-[#06C755] text-[10px] font-mono font-medium">QR Code</span>
+                    </div>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">ID: quincychen0313</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">即時溝通合作、商務洽詢或快速對話</p>
+                  </div>
+                </div>
+                <i data-lucide="qr-code" class="text-neutral-400 group-hover:scale-110 transition-transform mr-1 w-5 h-5 shrink-0"></i>
+              </button>
+
+              <!-- WhatsApp -->
+              <a href="https://wa.me/886917080313" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50 dark:bg-emerald-950/20 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-emerald-400 shrink-0">
+                    <i data-lucide="phone" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">WhatsApp</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">國際洽詢與專案聯繫，直接開始對話</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+
+              <!-- Messenger -->
+              <a href="https://m.me/quincychen0313" target="_blank" rel="noreferrer" class="interactive-card w-full text-left flex items-center justify-between p-5 rounded-2xl border border-sky-100 dark:border-sky-900/30 bg-sky-50 dark:bg-sky-950/20 group">
+                <div class="flex items-center gap-4 min-w-0">
+                  <div class="p-3 rounded-xl bg-neutral-900 shadow-sm text-sky-400 shrink-0">
+                    <i data-lucide="send" class="w-6 h-6"></i>
+                  </div>
+                  <div>
+                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Messenger</span>
+                    <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
+                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Facebook 私訊，快速回覆日常詢問</p>
+                  </div>
+                </div>
+                <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
+              </a>
+            </div>
+
+            <div id="tab-content-guestbook" class="tab-content hidden h-full overflow-y-auto custom-scrollbar pr-2 space-y-6">
+              <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
+                <div class="flex items-center gap-2">
+                  <i data-lucide="message-square" class="text-neutral-500 dark:text-neutral-400 w-5 h-5"></i>
+                  <h3 class="font-sans font-medium text-base uppercase tracking-wider text-neutral-800 dark:text-neutral-200">訪客留言板</h3>
+                </div>
+                <span id="guestbook-count" class="text-xs font-mono text-neutral-400">0 則留言</span>
+              </div>
+
+              <form id="guestbook-form" class="space-y-3 bg-neutral-50 dark:bg-neutral-950 p-4 rounded-xl border border-neutral-100 dark:border-neutral-900">
+                <div>
+                  <label for="guest-name" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">你的稱呼</label>
+                  <input id="guest-name" type="text" required placeholder="請輸入名字..." class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
+                </div>
+                <div>
+                  <label for="guest-message" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">留下你的祝福或留言</label>
+                  <textarea id="guest-message" required rows="2" maxlength="150" placeholder="寫點什麼給 Quincy 吧..." class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors resize-none"></textarea>
+                  <div class="flex justify-end text-xs font-mono text-neutral-400 mt-1"><span id="char-count">0</span>/150 字</div>
+                </div>
+                <button id="guestbook-submit-btn" type="submit" class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black font-sans text-sm font-semibold hover:opacity-90 active:scale-[.98] transition-all">
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i><span>送出留言</span>
+                </button>
+              </form>
+
+              <div id="guestbook-messages" class="space-y-3"></div>
+            </div>
+
+            <div id="tab-content-about" class="tab-content hidden h-full overflow-y-auto custom-scrollbar pr-2 space-y-4">
+              <div class="space-y-4 text-neutral-600 dark:text-neutral-300 font-sans text-sm leading-relaxed">
+                <div class="interactive-card p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
+                  <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
+                    <i data-lucide="file-text" class="text-neutral-500 w-4 h-4"></i>個人簡介 & 設計理念
+                  </h4>
+                  <p>你好，我是 Quincy！專注於極簡美學與品牌識別設計。我深信「好的設計不是增加多餘，而是減少贅飾直到完美」。</p>
+                </div>
+
+                <div class="interactive-card p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
+                  <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
+                    <i data-lucide="sparkles" class="text-amber-500 w-4 h-4"></i>關於個人 Logo 識別
+                  </h4>
+                  <p>我這款獨特個人 Logo 的核心設計，是利用書法、哥德字體與現代流線幾何相融合的字母 <strong class="text-neutral-900 dark:text-white font-mono">QUINCY</strong>，交織構築出西裝大衣的修長肩線與西裝翻領，上方承接俐落白描的帥氣男士側面與硬朗髮型。這代表著將「個人姓名」直接塑造為「服裝軀幹」，極富前衛時裝定製概念與極簡精緻風格。</p>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  <div class="interactive-card border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
+                    <span class="block text-xs font-mono text-neutral-400 uppercase">設計語彙</span>
+                    <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">極簡主義 / 高對比 / 流線</span>
+                  </div>
+                  <div class="interactive-card border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
+                    <span class="block text-xs font-mono text-neutral-400 uppercase">合作洽談</span>
+                    <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Instagram DM / LINE 聯絡</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="border-t border-neutral-100 dark:border-neutral-800 pt-4 mt-6 flex justify-between items-center text-[10px] font-mono text-neutral-400">
+            <span>© <span id="footer-year"></span> Quincy Chen. ALL RIGHTS RESERVED.</span>
+            <span class="hidden sm:inline">MINIMALISM IS AN ATTITUDE.</span>
+          </div>
+        </section>
+      </div>
+    </div>
+  </main>
+
+  <div id="line-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
+    <div id="line-modal-card" class="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-2xl border border-neutral-100 dark:border-neutral-800 text-center scale-95 transition-all duration-300">
+      <button id="line-close-btn" type="button" class="absolute top-4 right-4 p-1.5 rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 transition-colors" aria-label="關閉">
+        <i data-lucide="x" class="w-4 h-4"></i>
+      </button>
+      <div class="flex flex-col items-center mb-5">
+        <div class="w-10 h-10 rounded-full bg-[#06C755]/10 flex items-center justify-center text-[#06C755] mb-2">
+          <i data-lucide="message-circle" class="w-5 h-5"></i>
+        </div>
+        <h3 class="font-sans font-bold text-base text-neutral-900 dark:text-neutral-100">加入 LINE 好友</h3>
+      </div>
+
+      <div class="relative mx-auto w-52 h-52 bg-white p-3 rounded-2xl border border-neutral-100 dark:border-neutral-800 shadow-sm mb-4 overflow-hidden">
+        <img
+          src="https://api.qrserver.com/v1/create-qr-code/?size=220x220&data=https%3A%2F%2Fline.me%2Fti%2Fp%2F~quincychen0313"
+          alt="LINE QR Code"
+          class="w-full h-full object-contain"
+        >
+        <div class="absolute left-3 right-3 h-0.5 bg-[#06C755] opacity-75 shadow-[0_0_8px_#06C755] animate-[scan_2s_ease-in-out_infinite_alternate]"></div>
+      </div>
+
+      <p class="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto mb-4 leading-relaxed">
+        請在 LINE 應用程式中掃描 QR Code，或直接點擊下方 LINE ID。
+      </p>
+
+      <div class="bg-neutral-50 dark:bg-neutral-950 rounded-xl p-3 flex items-center justify-between border border-neutral-100 dark:border-neutral-800">
+        <a href="https://line.me/ti/p/~quincychen0313" target="_blank" rel="noopener noreferrer" class="text-left flex-1 mr-2 group">
+          <span class="block font-mono text-[10px] uppercase tracking-wider text-neutral-400 font-semibold group-hover:text-[#06C755] transition-colors">LINE ID</span>
+          <span class="font-mono text-sm text-neutral-900 dark:text-neutral-200 font-bold group-hover:text-[#06C755] transition-colors">quincychen0313</span>
+        </a>
+        <button id="copy-line-btn" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-all shrink-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-700">
+          <i data-lucide="copy" class="w-3 h-3"></i><span>複製 ID</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes scan { 0% { top: 6%; } 100% { top: 94%; } }
+  </style>
+
+  <script>
+    const state = {
+      darkMode: true,
+      activeTab: 'links',
+      profileName: 'Quincy Chen / 陳宏瑋',
+      profileLocation: 'Taichung, Taiwan / 台中, 台灣',
+      profileBio: '獨立品牌設計師 & 創意總監。致力於將高對比、極簡線條與極致對稱美學，融入數位產品與實體媒介中。',
+      lineId: 'quincychen0313',
+      messages: []
+    };
+
+    const AVATAR_COLORS = [
+      'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
+      'bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300',
+      'bg-neutral-200 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300',
+      'bg-stone-200 dark:bg-stone-800 text-stone-700 dark:text-stone-300'
+    ];
+
+    let guestbookDB = null;
+
+    const CLIENT_TOKEN = (() => {
+      let token = localStorage.getItem('quincy_client_token');
+      if (!token) {
+        token = Math.random().toString(36).slice(2) + Date.now().toString(36);
+        localStorage.setItem('quincy_client_token', token);
+      }
+      return token;
+    })();
+
+    function loadState() {
+      if (localStorage.getItem('quincy_dark_mode') !== null) {
+        state.darkMode = localStorage.getItem('quincy_dark_mode') === 'true';
+      }
+      const savedMessages = localStorage.getItem('quincy_guestbook_messages');
+      if (savedMessages) {
+        try { state.messages = JSON.parse(savedMessages); } catch (_) {}
+      }
+    }
+
+    function saveState() {
+      localStorage.setItem('quincy_dark_mode', String(state.darkMode));
+      localStorage.setItem('quincy_guestbook_messages', JSON.stringify(state.messages));
+    }
+
+    function applyTheme() {
+      document.documentElement.classList.toggle('dark', state.darkMode);
+      document.querySelector('meta[name="theme-color"]').setAttribute('content', state.darkMode ? '#0a0a0a' : '#fafafa');
+    }
+
+    function renderProfile() {
+      const nameEl = document.getElementById('profile-name');
+      const parts = state.profileName.split('/').map(s => s.trim()).filter(Boolean);
+      nameEl.innerHTML = '';
+      parts.forEach((part, index) => {
+        const span = document.createElement('span');
+        span.textContent = part;
+        span.className = 'block whitespace-nowrap' + (index ? ' text-xl md:text-2xl mt-0.5 text-neutral-700 dark:text-neutral-300' : '');
+        nameEl.appendChild(span);
+      });
+      document.getElementById('profile-location').textContent = state.profileLocation;
+      document.getElementById('profile-bio').textContent = state.profileBio;
+      document.getElementById('footer-year').textContent = new Date().getFullYear();
+    }
+
+    function movePill(tabId, animate = true) {
+      const bar = document.getElementById('tab-bar');
+      const pill = document.getElementById('glass-pill');
+      const btn = document.getElementById(`tab-btn-${tabId}`);
+      if (!bar || !pill || !btn) return;
+      if (!animate) pill.style.transition = 'none';
+
+      const br = bar.getBoundingClientRect();
+      const tr = btn.getBoundingClientRect();
+      pill.style.left = `${tr.left - br.left}px`;
+      pill.style.width = `${tr.width}px`;
+
+      if (!animate) {
+        void pill.offsetWidth;
+        pill.style.transition = '';
+      } else {
+        bar.classList.remove('is-moving');
+        void pill.offsetWidth;
+        bar.classList.add('is-moving');
+        clearTimeout(movePill._timer);
+        movePill._timer = setTimeout(() => bar.classList.remove('is-moving'), 560);
+      }
+    }
+
+    function switchTab(tabId) {
+      const same = state.activeTab === tabId;
+      state.activeTab = tabId;
+
+      ['links','guestbook','about'].forEach(id => {
+        const button = document.getElementById(`tab-btn-${id}`);
+        const content = document.getElementById(`tab-content-${id}`);
+        const active = id === tabId;
+
+        button.className = active
+          ? 'tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-semibold text-neutral-900 dark:text-white transition-colors duration-300'
+          : 'tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300';
+
+        content.classList.toggle('hidden', !active);
+        if (active && !same) {
+          content.classList.remove('tab-enter');
+          void content.offsetWidth;
+          content.classList.add('tab-enter');
+        }
+      });
+
+      movePill(tabId, !same);
+      lucide.createIcons();
+      initInteractiveCards();
+    }
+
+    function escapeHtml(value) {
+      return String(value)
+        .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+        .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+    }
+
+    function renderGuestbook() {
+      const container = document.getElementById('guestbook-messages');
+      document.getElementById('guestbook-count').textContent = `${state.messages.length} 則留言`;
+
+      if (!state.messages.length) {
+        container.innerHTML = '<div class="py-8 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm"><p>尚無留言。留下第一則祝福吧！</p></div>';
+        return;
+      }
+
+      container.innerHTML = state.messages.map(msg => {
+        const canDelete = msg.owner === CLIENT_TOKEN;
+        return `
+          <div class="interactive-card bg-neutral-50/60 dark:bg-neutral-950/40 p-3.5 rounded-xl border border-neutral-100 dark:border-neutral-900 flex gap-3 group relative">
+            <div class="w-9 h-9 rounded-full ${msg.avatarColor || AVATAR_COLORS[0]} flex items-center justify-center font-sans text-xs font-bold shrink-0">
+              ${escapeHtml(msg.name || '?').charAt(0).toUpperCase()}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-baseline justify-between mb-0.5 ${canDelete ? 'pr-7' : ''}">
+                <span class="font-sans font-bold text-sm text-neutral-800 dark:text-neutral-200 truncate">${escapeHtml(msg.name || '')}</span>
+                <span class="font-mono text-[10px] text-neutral-400">${escapeHtml(msg.timestamp || '')}</span>
+              </div>
+              <p class="font-sans text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed break-words">${escapeHtml(msg.message || '')}</p>
+            </div>
+            ${canDelete ? `<button type="button" class="delete-message absolute top-3 right-3 p-1 rounded-md text-neutral-400 hover:text-red-500 transition-colors" data-id="${msg.id}" aria-label="刪除留言"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+          </div>`;
+      }).join('');
+
+      container.querySelectorAll('.delete-message').forEach(btn => {
+        btn.addEventListener('click', () => deleteMessage(btn.dataset.id));
+      });
+      lucide.createIcons();
+      initInteractiveCards();
+    }
+
+    function initGuestbookSync() {
+      if (!window.firebase || !FIREBASE_CONFIG) {
+        renderGuestbook();
+        return;
+      }
+      try {
+        if (!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+        guestbookDB = firebase.database();
+        guestbookDB.ref('guestbook').orderByChild('ts').on('value', snap => {
+          const raw = snap.val() || {};
+          state.messages = Object.entries(raw)
+            .map(([key, value]) => ({ ...value, id: key }))
+            .sort((a,b) => (b.ts || 0) - (a.ts || 0));
+          renderGuestbook();
+        }, () => {
+          guestbookDB = null;
+          renderGuestbook();
+        });
+      } catch (_) {
+        guestbookDB = null;
+        renderGuestbook();
+      }
+    }
+
+    function submitGuestbook(event) {
+      event.preventDefault();
+      const nameInput = document.getElementById('guest-name');
+      const messageInput = document.getElementById('guest-message');
+      const name = nameInput.value.trim();
+      const message = messageInput.value.trim();
+      if (!name || !message) return;
+
+      const now = new Date();
+      const timestamp = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+      const newMessage = {
+        name, message, timestamp,
+        ts: Date.now(),
+        owner: CLIENT_TOKEN,
+        avatarColor: AVATAR_COLORS[Math.floor(Math.random() * AVATAR_COLORS.length)]
+      };
+
+      const finish = text => {
+        nameInput.value = '';
+        messageInput.value = '';
+        document.getElementById('char-count').textContent = '0';
+        showToast(text);
+      };
+
+      if (guestbookDB) {
+        guestbookDB.ref('guestbook').push(newMessage)
+          .then(() => finish('留言成功送出！'))
+          .catch(() => showToast('送出失敗，請稍後再試。'));
+      } else {
+        newMessage.id = String(Date.now());
+        state.messages.unshift(newMessage);
+        saveState();
+        renderGuestbook();
+        finish('留言已儲存在此瀏覽器。');
+      }
+    }
+
+    function deleteMessage(id) {
+      const msg = state.messages.find(item => item.id === id);
+      if (!msg || msg.owner !== CLIENT_TOKEN) return;
+      if (!confirm('確定要刪除這則留言嗎？')) return;
+
+      if (guestbookDB) {
+        guestbookDB.ref(`guestbook/${id}`).remove().then(() => showToast('留言已刪除。'));
+      } else {
+        state.messages = state.messages.filter(item => item.id !== id);
+        saveState();
+        renderGuestbook();
+        showToast('留言已刪除。');
+      }
+    }
+
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      document.getElementById('toast-message').textContent = message;
+      toast.classList.remove('-translate-y-20','opacity-0');
+      toast.classList.add('translate-y-0','opacity-100');
+      clearTimeout(showToast._timer);
+      showToast._timer = setTimeout(() => {
+        toast.classList.add('-translate-y-20','opacity-0');
+        toast.classList.remove('translate-y-0','opacity-100');
+      }, 2400);
+    }
+
+    function openLineModal() {
+      const modal = document.getElementById('line-modal');
+      const card = document.getElementById('line-modal-card');
+      modal.classList.remove('opacity-0','pointer-events-none');
+      card.classList.remove('scale-95');
+      card.classList.add('scale-100');
+    }
+
+    function closeLineModal() {
+      const modal = document.getElementById('line-modal');
+      const card = document.getElementById('line-modal-card');
+      modal.classList.add('opacity-0','pointer-events-none');
+      card.classList.add('scale-95');
+      card.classList.remove('scale-100');
+    }
+
+    async function copyLineId() {
+      try {
+        await navigator.clipboard.writeText(state.lineId);
+        showToast('LINE ID 已複製');
+      } catch (_) {
+        showToast(`LINE ID：${state.lineId}`);
+      }
+    }
+
+    function initPointerEffects() {
+      const root = document.documentElement;
+      const board = document.getElementById('portal-board');
+      const boardWrap = document.getElementById('portal-board-wrap');
+      const logo = document.getElementById('logo-container');
+
+      window.addEventListener('pointermove', event => {
+        root.style.setProperty('--mx', `${event.clientX}px`);
+        root.style.setProperty('--my', `${event.clientY}px`);
+      }, { passive: true });
+
+      if (matchMedia('(hover: hover) and (pointer: fine)').matches) {
+        boardWrap.addEventListener('pointermove', event => {
+          const rect = boardWrap.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          root.style.setProperty('--tilt-x', `${(-y * 3.4).toFixed(2)}deg`);
+          root.style.setProperty('--tilt-y', `${(x * 4.2).toFixed(2)}deg`);
+          root.style.setProperty('--logo-x', `${(x * 9).toFixed(2)}px`);
+          root.style.setProperty('--logo-y', `${(y * 7).toFixed(2)}px`);
+          root.style.setProperty('--logo-r', `${(x * 1.2).toFixed(2)}deg`);
+          board.classList.remove('is-settling');
+        }, { passive: true });
+
+        boardWrap.addEventListener('pointerleave', () => {
+          board.classList.add('is-settling');
+          root.style.setProperty('--tilt-x','0deg');
+          root.style.setProperty('--tilt-y','0deg');
+          root.style.setProperty('--logo-x','0px');
+          root.style.setProperty('--logo-y','0px');
+          root.style.setProperty('--logo-r','0deg');
+          setTimeout(() => board.classList.remove('is-settling'), 650);
+        });
+
+        logo.addEventListener('pointermove', event => {
+          const rect = logo.getBoundingClientRect();
+          const x = (event.clientX - rect.left) / rect.width - .5;
+          const y = (event.clientY - rect.top) / rect.height - .5;
+          root.style.setProperty('--logo-x', `${(x * 14).toFixed(2)}px`);
+          root.style.setProperty('--logo-y', `${(y * 12).toFixed(2)}px`);
+        }, { passive: true });
+      }
+    }
+
+    function initInteractiveCards() {
+      document.querySelectorAll('.interactive-card').forEach(card => {
+        if (card.dataset.motionReady) return;
+        card.dataset.motionReady = '1';
+        card.addEventListener('pointermove', event => {
+          const rect = card.getBoundingClientRect();
+          card.style.setProperty('--cx', `${event.clientX - rect.left}px`);
+          card.style.setProperty('--cy', `${event.clientY - rect.top}px`);
+        }, { passive: true });
+      });
+    }
+
+
+
+    function initMaxMotion() {
+      if (!matchMedia('(hover: hover) and (pointer: fine)').matches) return;
+      const core = document.getElementById('cursor-core');
+      const ring = document.getElementById('cursor-ring');
+      const trail = document.getElementById('trail-layer');
+      let tx = innerWidth/2, ty = innerHeight/2, rx = tx, ry = ty, lastTrail = 0;
+
+      const animateCursor = () => {
+        rx += (tx-rx)*.16; ry += (ty-ry)*.16;
+        ring.style.transform = `translate3d(${rx}px,${ry}px,0)`;
+        requestAnimationFrame(animateCursor);
+      };
+      animateCursor();
+
+      window.addEventListener('pointermove', e => {
+        tx=e.clientX; ty=e.clientY;
+        core.style.transform=`translate3d(${tx}px,${ty}px,0)`;
+        document.body.classList.add('cursor-live');
+        const now=performance.now();
+        if (now-lastTrail>34) {
+          lastTrail=now;
+          const star=document.createElement('span'); star.className='trail-star';
+          star.style.left=tx+'px'; star.style.top=ty+'px';
+          const size=2+Math.random()*3; star.style.width=size+'px'; star.style.height=size+'px';
+          trail.appendChild(star); setTimeout(()=>star.remove(),720);
+        }
+      }, {passive:true});
+
+      document.querySelectorAll('a,button,.interactive-card').forEach(el=>{
+        el.addEventListener('pointerenter',()=>document.body.classList.add('cursor-hot'));
+        el.addEventListener('pointerleave',()=>document.body.classList.remove('cursor-hot'));
+      });
+
+      document.querySelectorAll('.interactive-card').forEach(card=>{
+        card.addEventListener('pointermove', e=>{
+          const r=card.getBoundingClientRect();
+          const nx=(e.clientX-r.left)/r.width-.5, ny=(e.clientY-r.top)/r.height-.5;
+          card.style.setProperty('--ry',`${(nx*5.5).toFixed(2)}deg`);
+          card.style.setProperty('--rx',`${(-ny*4.5).toFixed(2)}deg`);
+          card.style.setProperty('--magx',`${(nx*3).toFixed(2)}px`);
+          card.style.setProperty('--magy',`${(ny*2).toFixed(2)}px`);
+        },{passive:true});
+        card.addEventListener('pointerleave',()=>{
+          card.style.setProperty('--ry','0deg'); card.style.setProperty('--rx','0deg');
+          card.style.setProperty('--magx','0px'); card.style.setProperty('--magy','0px');
+        });
+        card.addEventListener('pointerdown', e=>{
+          const r=card.getBoundingClientRect(); const ripple=document.createElement('span');
+          ripple.className='click-ripple'; ripple.style.left=(e.clientX-r.left)+'px'; ripple.style.top=(e.clientY-r.top)+'px';
+          card.appendChild(ripple); setTimeout(()=>ripple.remove(),650);
+        });
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      loadState();
+      applyTheme();
+      renderProfile();
+      initGuestbookSync();
+      lucide.createIcons();
+
+      document.getElementById('theme-toggle-btn').addEventListener('click', () => {
+        state.darkMode = !state.darkMode;
+        applyTheme();
+        saveState();
+      });
+
+      document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => switchTab(btn.dataset.tab));
+      });
+
+      document.getElementById('guestbook-form').addEventListener('submit', submitGuestbook);
+      document.getElementById('guest-message').addEventListener('input', event => {
+        document.getElementById('char-count').textContent = event.target.value.length;
+      });
+
+      document.getElementById('line-open-btn').addEventListener('click', openLineModal);
+      document.getElementById('line-close-btn').addEventListener('click', closeLineModal);
+      document.getElementById('line-modal').addEventListener('click', event => {
+        if (event.target.id === 'line-modal') closeLineModal();
+      });
+      document.getElementById('copy-line-btn').addEventListener('click', copyLineId);
+      document.addEventListener('keydown', event => {
+        if (event.key === 'Escape') closeLineModal();
+      });
+
+      initPointerEffects();
+      initInteractiveCards();
+      initMaxMotion();
+      requestAnimationFrame(() => {
+        movePill('links', false);
+        document.body.classList.add('is-ready');
+      });
+    });
+
+    window.addEventListener('load', () => movePill(state.activeTab, false));
+    window.addEventListener('resize', () => movePill(state.activeTab, false));
+  </script>
+</body>
+</html>
