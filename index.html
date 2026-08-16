@@ -402,6 +402,10 @@
       opacity: 0; transform: translateY(16px) scale(.94); filter: blur(12px);
       animation: introWord 1.1s .08s cubic-bezier(.16,1,.3,1) forwards;
     }
+    #intro-gate .intro-v {
+      color:#d4af37;
+      text-shadow:0 0 18px rgba(212,175,55,.38);
+    }
     #intro-gate .intro-line {
       position: absolute; left: 50%; top: calc(50% + 42px); width: min(280px,56vw); height: 1px;
       transform: translateX(-50%) scaleX(0); transform-origin: center;
@@ -563,7 +567,7 @@
 </head>
 
 <body class="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 relative overflow-x-hidden flex flex-col">
-  <div id="intro-gate" aria-hidden="true"><div class="intro-word">qVsion</div><div class="intro-line"></div></div>
+  <div id="intro-gate" aria-hidden="true"><div class="intro-word">q<span class="intro-v">V</span>sion</div><div class="intro-line"></div></div>
   <div id="cursor-core" aria-hidden="true"></div><div id="cursor-ring" aria-hidden="true"></div><div id="trail-layer" aria-hidden="true"></div>
   <div id="marcello-backdrop" aria-hidden="true">
     <video class="seamless-video is-active" data-loop-slot="0" autoplay muted playsinline preload="auto">
