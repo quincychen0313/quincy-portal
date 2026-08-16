@@ -481,6 +481,42 @@
     #theme-toggle-btn:active { transform:scale(.96); }
     #theme-toggle-btn { transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .3s, background-color .3s; }
 
+    #language-toggle-btn {
+      display:flex;
+      align-items:center;
+      gap:3px;
+      height:44px;
+      padding:4px;
+      border-radius:9999px;
+      border:1px solid rgba(163,163,163,.28);
+      background:rgba(245,245,245,.9);
+      box-shadow:inset 0 1px 3px rgba(0,0,0,.08);
+    }
+    .dark #language-toggle-btn {
+      border-color:rgba(82,82,82,.85);
+      background:rgba(23,23,23,.9);
+    }
+    #language-toggle-btn .lang-choice {
+      min-width:48px;
+      height:34px;
+      padding:0 10px;
+      border-radius:9999px;
+      display:grid;
+      place-items:center;
+      font:600 11px/1 'Inter',sans-serif;
+      color:#a3a3a3;
+    }
+    #language-toggle-btn .lang-choice.is-active {
+      color:#171717;
+      background:#fff;
+      box-shadow:0 3px 10px rgba(0,0,0,.12);
+    }
+    .dark #language-toggle-btn .lang-choice.is-active {
+      color:#fff;
+      background:#404040;
+      box-shadow:0 3px 12px rgba(0,0,0,.35);
+    }
+
     #ace-web-pet {
       position:relative;
       z-index:25;
@@ -599,18 +635,23 @@
       <span id="toast-message">完成</span>
     </div>
 
-    <button
-      id="theme-toggle-btn"
-      type="button"
-      aria-label="切換深淺色主題"
-      title="淺色 / 深色模式"
-      class="relative w-[88px] h-[44px] rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/90 dark:bg-neutral-900/90 shadow-inner transition-colors duration-300 hover:border-neutral-300 dark:hover:border-neutral-600 shrink-0 reveal"
-      style="--delay:120ms"
-    >
-      <i data-lucide="sun" class="absolute left-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400 pointer-events-none"></i>
-      <i data-lucide="moon" class="absolute right-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-indigo-300 pointer-events-none"></i>
-      <span id="theme-knob"></span>
-    </button>
+    <div class="flex items-center gap-3 reveal" style="--delay:120ms">
+      <button
+        id="theme-toggle-btn"
+        type="button"
+        aria-label="切換深淺色主題"
+        title="淺色 / 深色模式"
+        class="relative w-[88px] h-[44px] rounded-full border border-neutral-200 dark:border-neutral-700 bg-neutral-100/90 dark:bg-neutral-900/90 shadow-inner transition-colors duration-300 hover:border-neutral-300 dark:hover:border-neutral-600 shrink-0"
+      >
+        <i data-lucide="sun" class="absolute left-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-amber-400 pointer-events-none"></i>
+        <i data-lucide="moon" class="absolute right-[12px] top-1/2 -translate-y-1/2 w-5 h-5 text-neutral-400 dark:text-indigo-300 pointer-events-none"></i>
+        <span id="theme-knob"></span>
+      </button>
+      <button id="language-toggle-btn" type="button" aria-label="切換中文或英文" title="中文 / English">
+        <span class="lang-choice" data-lang-choice="zh">中文</span>
+        <span class="lang-choice" data-lang-choice="en">English</span>
+      </button>
+    </div>
 
     <div id="portal-board-wrap" class="reveal" style="--delay:180ms">
       <div id="portal-board" class="w-full bg-white/90 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800/80 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 backdrop-blur-xl">
@@ -639,7 +680,7 @@
                 <p class="font-sans text-xs italic text-neutral-600 dark:text-neutral-400 leading-normal tracking-wide">
                   "One must still have chaos in oneself, to give birth to a dancing star."
                 </p>
-                <p class="font-sans text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 leading-normal">
+                <p data-i18n="quoteTranslation" class="font-sans text-xs text-neutral-600 dark:text-neutral-400 mt-1.5 leading-normal">
                   「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」
                 </p>
                 <span class="font-mono text-[10px] text-neutral-500 mt-1 uppercase tracking-widest">— Nietzsche</span>
@@ -676,13 +717,13 @@
             <div id="tab-bar" class="relative inline-flex items-center gap-1 p-1.5 rounded-full bg-neutral-100/80 dark:bg-neutral-800/60 border border-neutral-200/70 dark:border-neutral-700/50 shadow-inner">
               <div id="glass-pill"></div>
               <button id="tab-btn-links" data-tab="links" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-semibold text-neutral-900 dark:text-white transition-colors duration-300">
-                <i data-lucide="globe" class="w-4 h-4"></i><span>社群連結</span>
+                <i data-lucide="globe" class="w-4 h-4"></i><span data-i18n="tabLinks">社群連結</span>
               </button>
               <button id="tab-btn-guestbook" data-tab="guestbook" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300">
-                <i data-lucide="message-square" class="w-4 h-4"></i><span>留言板</span>
+                <i data-lucide="message-square" class="w-4 h-4"></i><span data-i18n="tabGuestbook">留言板</span>
               </button>
               <button id="tab-btn-about" data-tab="about" type="button" class="tab-btn relative z-10 flex items-center gap-2 py-2 px-4 rounded-full font-sans text-sm font-medium text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors duration-300">
-                <i data-lucide="info" class="w-4 h-4"></i><span>關於我</span>
+                <i data-lucide="info" class="w-4 h-4"></i><span data-i18n="tabAbout">關於我</span>
               </button>
             </div>
           </div>
@@ -696,9 +737,9 @@
                     <img src="favicon-64.png" alt="Quincy Logo" class="w-8 h-8 object-contain select-none">
                   </div>
                   <div class="min-w-0">
-                    <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">個人網頁入口 / 作品集</span>
+                    <span data-i18n="websiteTitle" class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">個人網頁入口 / 作品集</span>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">quincychen0313.github.io</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">探索更多設計專案與數位產品作品集</p>
+                    <p data-i18n="websiteDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">探索更多設計專案與數位產品作品集</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:text-neutral-700 dark:group-hover:text-neutral-200 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -713,7 +754,7 @@
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Instagram</span>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">生活日常、攝影作品與美學設計點滴</p>
+                    <p data-i18n="instagramDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">生活日常、攝影作品與美學設計點滴</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -728,7 +769,7 @@
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Facebook</span>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">Quincy Chen</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">專業文章、設計觀點與趨勢分享</p>
+                    <p data-i18n="facebookDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">專業文章、設計觀點與趨勢分享</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -743,7 +784,7 @@
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Threads</span>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Threads 社群分享、生活碎念與日常互動</p>
+                    <p data-i18n="threadsDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Threads 社群分享、生活碎念與日常互動</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -757,7 +798,7 @@
                   </div>
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">FaceTime</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Apple 裝置直撥語音通話，即刻對談</p>
+                    <p data-i18n="facetimeDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Apple 裝置直撥語音通話，即刻對談</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -771,11 +812,11 @@
                   </div>
                   <div>
                     <div class="flex items-center gap-1.5">
-                      <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">LINE 聯絡我</span>
+                      <span data-i18n="lineTitle" class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">LINE 聯絡我</span>
                       <span class="inline-flex px-1.5 py-0.5 rounded-full bg-[#06C755]/20 text-[#06C755] text-[10px] font-mono font-medium">QR Code</span>
                     </div>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">ID: quincychen0313</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">即時溝通合作、商務洽詢或快速對話</p>
+                    <p data-i18n="lineDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">即時溝通合作、商務洽詢或快速對話</p>
                   </div>
                 </div>
                 <i data-lucide="qr-code" class="text-neutral-400 group-hover:scale-110 transition-transform mr-1 w-5 h-5 shrink-0"></i>
@@ -789,7 +830,7 @@
                   </div>
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">WhatsApp</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">國際洽詢與專案聯繫，直接開始對話</p>
+                    <p data-i18n="whatsappDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">國際洽詢與專案聯繫，直接開始對話</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -804,7 +845,7 @@
                   <div>
                     <span class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-200">Messenger</span>
                     <span class="block font-mono text-xs text-neutral-400 mt-0.5">@quincychen0313</span>
-                    <p class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Facebook 私訊，快速回覆日常詢問</p>
+                    <p data-i18n="messengerDesc" class="font-sans text-sm text-neutral-500 dark:text-neutral-400 mt-1">Facebook 私訊，快速回覆日常詢問</p>
                   </div>
                 </div>
                 <i data-lucide="arrow-up-right" class="text-neutral-400 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all mr-1 w-5 h-5 shrink-0"></i>
@@ -815,23 +856,23 @@
               <div class="flex items-center justify-between border-b border-neutral-100 dark:border-neutral-800 pb-3">
                 <div class="flex items-center gap-2">
                   <i data-lucide="message-square" class="text-neutral-500 dark:text-neutral-400 w-5 h-5"></i>
-                  <h3 class="font-sans font-medium text-base uppercase tracking-wider text-neutral-800 dark:text-neutral-200">訪客留言板</h3>
+                  <h3 data-i18n="guestbookTitle" class="font-sans font-medium text-base uppercase tracking-wider text-neutral-800 dark:text-neutral-200">訪客留言板</h3>
                 </div>
                 <span id="guestbook-count" class="text-xs font-mono text-neutral-400">0 則留言</span>
               </div>
 
               <form id="guestbook-form" class="space-y-3 bg-neutral-50 dark:bg-neutral-950 p-4 rounded-xl border border-neutral-100 dark:border-neutral-900">
                 <div>
-                  <label for="guest-name" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">你的稱呼</label>
+                  <label data-i18n="guestNameLabel" for="guest-name" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">你的稱呼</label>
                   <input id="guest-name" type="text" required placeholder="請輸入名字..." class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors">
                 </div>
                 <div>
-                  <label for="guest-message" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">留下你的祝福或留言</label>
+                  <label data-i18n="guestMessageLabel" for="guest-message" class="block font-mono text-xs uppercase tracking-wider text-neutral-400 font-semibold mb-1">留下你的祝福或留言</label>
                   <textarea id="guest-message" required rows="2" maxlength="150" placeholder="寫點什麼給 Quincy 吧..." class="w-full font-sans text-sm bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg px-3 py-2 text-neutral-800 dark:text-neutral-200 focus:outline-none focus:border-neutral-400 dark:focus:border-neutral-600 transition-colors resize-none"></textarea>
-                  <div class="flex justify-end text-xs font-mono text-neutral-400 mt-1"><span id="char-count">0</span>/150 字</div>
+                  <div class="flex justify-end text-xs font-mono text-neutral-400 mt-1"><span id="char-count">0</span><span id="char-limit-suffix">/150 字</span></div>
                 </div>
                 <button id="guestbook-submit-btn" type="submit" class="w-full flex items-center justify-center gap-2 py-2 px-4 rounded-lg bg-black dark:bg-white text-white dark:text-black font-sans text-sm font-semibold hover:opacity-90 active:scale-[.98] transition-all">
-                  <i data-lucide="send" class="w-3.5 h-3.5"></i><span>送出留言</span>
+                  <i data-lucide="send" class="w-3.5 h-3.5"></i><span data-i18n="submitMessage">送出留言</span>
                 </button>
               </form>
 
@@ -842,26 +883,26 @@
               <div class="space-y-4 text-neutral-600 dark:text-neutral-300 font-sans text-sm leading-relaxed">
                 <div class="interactive-card p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
                   <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
-                    <i data-lucide="file-text" class="text-neutral-500 w-4 h-4"></i>個人簡介 & 設計理念
+                    <i data-lucide="file-text" class="text-neutral-500 w-4 h-4"></i><span data-i18n="aboutIntroTitle">個人簡介 & 設計理念</span>
                   </h4>
-                  <p>你好，我是 Quincy！專注於極簡美學與品牌識別設計。我深信「好的設計不是增加多餘，而是減少贅飾直到完美」。</p>
+                  <p data-i18n="aboutIntroCopy">你好，我是 Quincy！專注於極簡美學與品牌識別設計。我深信「好的設計不是增加多餘，而是減少贅飾直到完美」。</p>
                 </div>
 
                 <div class="interactive-card p-4 rounded-xl bg-neutral-50 dark:bg-neutral-950/50 border border-neutral-100 dark:border-neutral-900">
                   <h4 class="font-sans font-semibold text-base text-neutral-800 dark:text-neutral-100 mb-1 flex items-center gap-1.5">
-                    <i data-lucide="sparkles" class="text-amber-500 w-4 h-4"></i>關於個人 Logo 識別
+                    <i data-lucide="sparkles" class="text-amber-500 w-4 h-4"></i><span data-i18n="aboutLogoTitle">關於個人 Logo 識別</span>
                   </h4>
-                  <p>我這款獨特個人 Logo 的核心設計，是利用書法、哥德字體與現代流線幾何相融合的字母 <strong class="text-neutral-900 dark:text-white font-mono">QUINCY</strong>，交織構築出西裝大衣的修長肩線與西裝翻領，上方承接俐落白描的帥氣男士側面與硬朗髮型。這代表著將「個人姓名」直接塑造為「服裝軀幹」，極富前衛時裝定製概念與極簡精緻風格。</p>
+                  <p data-i18n-html="aboutLogoCopy">我這款獨特個人 Logo 的核心設計，是利用書法、哥德字體與現代流線幾何相融合的字母 <strong class="text-neutral-900 dark:text-white font-mono">QUINCY</strong>，交織構築出西裝大衣的修長肩線與西裝翻領，上方承接俐落白描的帥氣男士側面與硬朗髮型。這代表著將「個人姓名」直接塑造為「服裝軀幹」，極富前衛時裝定製概念與極簡精緻風格。</p>
                 </div>
 
                 <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
                   <div class="interactive-card border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
-                    <span class="block text-xs font-mono text-neutral-400 uppercase">設計語彙</span>
-                    <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">極簡主義 / 高對比 / 流線</span>
+                    <span data-i18n="designLanguage" class="block text-xs font-mono text-neutral-400 uppercase">設計語彙</span>
+                    <span data-i18n="designLanguageValue" class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">極簡主義 / 高對比 / 流線</span>
                   </div>
                   <div class="interactive-card border border-neutral-200 dark:border-neutral-800 p-4 rounded-xl text-center">
-                    <span class="block text-xs font-mono text-neutral-400 uppercase">合作洽談</span>
-                    <span class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Instagram DM / LINE 聯絡</span>
+                    <span data-i18n="collaboration" class="block text-xs font-mono text-neutral-400 uppercase">合作洽談</span>
+                    <span data-i18n="collaborationValue" class="text-sm font-semibold text-neutral-800 dark:text-neutral-200">Instagram DM / LINE 聯絡</span>
                   </div>
                 </div>
               </div>
@@ -886,7 +927,7 @@
         <div class="w-10 h-10 rounded-full bg-[#06C755]/10 flex items-center justify-center text-[#06C755] mb-2">
           <i data-lucide="message-circle" class="w-5 h-5"></i>
         </div>
-        <h3 class="font-sans font-bold text-base text-neutral-900 dark:text-neutral-100">加入 LINE 好友</h3>
+        <h3 data-i18n="lineModalTitle" class="font-sans font-bold text-base text-neutral-900 dark:text-neutral-100">加入 LINE 好友</h3>
       </div>
 
       <div class="relative mx-auto w-52 h-52 bg-white p-3 rounded-2xl border border-neutral-100 dark:border-neutral-800 shadow-sm mb-4 overflow-hidden">
@@ -898,7 +939,7 @@
         <div class="absolute left-3 right-3 h-0.5 bg-[#06C755] opacity-75 shadow-[0_0_8px_#06C755] animate-[scan_2s_ease-in-out_infinite_alternate]"></div>
       </div>
 
-      <p class="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto mb-4 leading-relaxed">
+      <p data-i18n="lineInstruction" class="font-sans text-[11px] text-neutral-500 dark:text-neutral-400 max-w-xs mx-auto mb-4 leading-relaxed">
         請在 LINE 應用程式中掃描 QR Code，或直接點擊下方 LINE ID。
       </p>
 
@@ -908,7 +949,7 @@
           <span class="font-mono text-sm text-neutral-900 dark:text-neutral-200 font-bold group-hover:text-[#06C755] transition-colors">quincychen0313</span>
         </a>
         <button id="copy-line-btn" type="button" class="flex items-center gap-1.5 px-3 py-1.5 rounded-lg font-sans text-xs font-medium transition-all shrink-0 bg-neutral-200 dark:bg-neutral-800 text-neutral-800 dark:text-neutral-200 hover:bg-neutral-300 dark:hover:bg-neutral-700">
-          <i data-lucide="copy" class="w-3 h-3"></i><span>複製 ID</span>
+          <i data-lucide="copy" class="w-3 h-3"></i><span data-i18n="copyId">複製 ID</span>
         </button>
       </div>
     </div>
@@ -921,13 +962,125 @@
   <script>
     const state = {
       darkMode: true,
+      language: 'en',
       activeTab: 'links',
-      profileName: 'Quincy Chen / 陳宏瑋',
-      profileLocation: 'Taichung, Taiwan / 台中, 台灣',
-      profileBio: '獨立品牌設計師 & 創意總監。致力於將高對比、極簡線條與極致對稱美學，融入數位產品與實體媒介中。',
+      profileName: '',
+      profileLocation: '',
+      profileBio: '',
       lineId: 'quincychen0313',
       messages: []
     };
+
+    const COPY = {
+      zh: {
+        pageTitle: 'QUINCY PORTAL - 個人名片入口',
+        pageDescription: 'QUINCY PORTAL - 個人名片入口｜社群連結、留言板與關於我',
+        themeAria: '切換深淺色主題',
+        themeTitle: '淺色 / 深色模式',
+        languageAria: '切換中文或英文',
+        petAria: '拖曳 Ace 小偶，點一下可互動',
+        petTitle: '拖曳移動；點一下互動；雙擊回到原位',
+        quoteTranslation: '「人心中仍須保有混沌，才能誕生一顆會跳舞的星。」',
+        tabLinks: '社群連結',
+        tabGuestbook: '留言板',
+        tabAbout: '關於我',
+        profileName: 'Quincy Chen / 陳宏瑋',
+        profileLocation: 'Taichung, Taiwan / 台中, 台灣',
+        profileBio: '獨立品牌設計師 & 創意總監。致力於將高對比、極簡線條與極致對稱美學，融入數位產品與實體媒介中。',
+        websiteTitle: '個人網頁入口 / 作品集',
+        websiteDesc: '探索更多設計專案與數位產品作品集',
+        instagramDesc: '生活日常、攝影作品與美學設計點滴',
+        facebookDesc: '專業文章、設計觀點與趨勢分享',
+        threadsDesc: 'Threads 社群分享、生活碎念與日常互動',
+        facetimeDesc: 'Apple 裝置直撥語音通話，即刻對談',
+        lineTitle: 'LINE 聯絡我',
+        lineDesc: '即時溝通合作、商務洽詢或快速對話',
+        whatsappDesc: '國際洽詢與專案聯繫，直接開始對話',
+        messengerDesc: 'Facebook 私訊，快速回覆日常詢問',
+        guestbookTitle: '訪客留言板',
+        guestNameLabel: '你的稱呼',
+        guestNamePlaceholder: '請輸入名字...',
+        guestMessageLabel: '留下你的祝福或留言',
+        guestMessagePlaceholder: '寫點什麼給 Quincy 吧...',
+        charSuffix: '/150 字',
+        submitMessage: '送出留言',
+        aboutIntroTitle: '個人簡介 & 設計理念',
+        aboutIntroCopy: '你好，我是 Quincy！專注於極簡美學與品牌識別設計。我深信「好的設計不是增加多餘，而是減少贅飾直到完美」。',
+        aboutLogoTitle: '關於個人 Logo 識別',
+        aboutLogoCopy: '我這款獨特個人 Logo 的核心設計，是利用書法、哥德字體與現代流線幾何相融合的字母 <strong class="text-neutral-900 dark:text-white font-mono">QUINCY</strong>，交織構築出西裝大衣的修長肩線與西裝翻領，上方承接俐落白描的帥氣男士側面與硬朗髮型。這代表著將「個人姓名」直接塑造為「服裝軀幹」，極富前衛時裝定製概念與極簡精緻風格。',
+        designLanguage: '設計語彙',
+        designLanguageValue: '極簡主義 / 高對比 / 流線',
+        collaboration: '合作洽談',
+        collaborationValue: 'Instagram DM / LINE 聯絡',
+        lineModalTitle: '加入 LINE 好友',
+        lineInstruction: '請在 LINE 應用程式中掃描 QR Code，或直接點擊下方 LINE ID。',
+        copyId: '複製 ID',
+        close: '關閉',
+        noMessages: '尚無留言。留下第一則祝福吧！',
+        deleteMessage: '刪除留言',
+        sent: '留言成功送出！',
+        sendFailed: '送出失敗，請稍後再試。',
+        savedLocal: '留言已儲存在此瀏覽器。',
+        deleteConfirm: '確定要刪除這則留言嗎？',
+        deleted: '留言已刪除。',
+        copied: 'LINE ID 已複製'
+      },
+      en: {
+        pageTitle: 'QUINCY PORTAL — Personal Profile',
+        pageDescription: 'QUINCY PORTAL — Personal profile, social links, guestbook, and design story.',
+        themeAria: 'Toggle light or dark theme',
+        themeTitle: 'Light / Dark mode',
+        languageAria: 'Switch between Chinese and English',
+        petAria: 'Drag Ace; click to interact',
+        petTitle: 'Drag to move · Click to interact · Double-click to reset',
+        quoteTranslation: '',
+        tabLinks: 'Social Links',
+        tabGuestbook: 'Guestbook',
+        tabAbout: 'About',
+        profileName: 'Quincy Chen',
+        profileLocation: 'Taichung, Taiwan',
+        profileBio: 'Independent brand designer and creative director, bringing high contrast, minimal lines, and precise symmetry into digital products and physical media.',
+        websiteTitle: 'Personal Website / Portfolio',
+        websiteDesc: 'Explore more design projects and digital product work.',
+        instagramDesc: 'Daily life, photography, and notes on aesthetics and design.',
+        facebookDesc: 'Professional articles, design perspectives, and trend insights.',
+        threadsDesc: 'Short thoughts, daily moments, and community conversations.',
+        facetimeDesc: 'Start an audio call directly from an Apple device.',
+        lineTitle: 'Contact me on LINE',
+        lineDesc: 'Fast conversations for collaborations and business enquiries.',
+        whatsappDesc: 'International enquiries and direct project conversations.',
+        messengerDesc: 'Send a Facebook message for quick everyday questions.',
+        guestbookTitle: 'Guestbook',
+        guestNameLabel: 'Your name',
+        guestNamePlaceholder: 'Enter your name...',
+        guestMessageLabel: 'Leave a message',
+        guestMessagePlaceholder: 'Write something for Quincy...',
+        charSuffix: '/150 characters',
+        submitMessage: 'Send message',
+        aboutIntroTitle: 'Profile & Design Philosophy',
+        aboutIntroCopy: 'Hi, I’m Quincy. I focus on minimalist aesthetics and brand identity design. I believe good design is not about adding more, but removing the unnecessary until only the essential remains.',
+        aboutLogoTitle: 'About the Personal Logo',
+        aboutLogoCopy: 'The personal logo combines calligraphic and Gothic letterforms with modern flowing geometry. The letters <strong class="text-neutral-900 dark:text-white font-mono">QUINCY</strong> form the shoulders and lapels of a tailored coat, supporting a clean line portrait above. The name becomes the body of the mark—an expression of avant-garde tailoring and refined minimalism.',
+        designLanguage: 'Design Language',
+        designLanguageValue: 'Minimalism / High Contrast / Flow',
+        collaboration: 'Collaboration',
+        collaborationValue: 'Instagram DM / LINE',
+        lineModalTitle: 'Add me on LINE',
+        lineInstruction: 'Scan the QR code in LINE, or select the LINE ID below.',
+        copyId: 'Copy ID',
+        close: 'Close',
+        noMessages: 'No messages yet. Be the first to leave one!',
+        deleteMessage: 'Delete message',
+        sent: 'Message sent!',
+        sendFailed: 'Could not send. Please try again later.',
+        savedLocal: 'Message saved in this browser.',
+        deleteConfirm: 'Delete this message?',
+        deleted: 'Message deleted.',
+        copied: 'LINE ID copied'
+      }
+    };
+
+    const t = key => COPY[state.language][key] ?? key;
 
     const AVATAR_COLORS = [
       'bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300',
@@ -951,6 +1104,13 @@
       if (localStorage.getItem('quincy_dark_mode') !== null) {
         state.darkMode = localStorage.getItem('quincy_dark_mode') === 'true';
       }
+      const savedLanguage = localStorage.getItem('quincy_language');
+      if (savedLanguage === 'zh' || savedLanguage === 'en') {
+        state.language = savedLanguage;
+      } else {
+        const systemLanguage = String(navigator.language || '').toLowerCase();
+        state.language = systemLanguage === 'zh-tw' || systemLanguage === 'zh-hant-tw' ? 'zh' : 'en';
+      }
       const savedMessages = localStorage.getItem('quincy_guestbook_messages');
       if (savedMessages) {
         try { state.messages = JSON.parse(savedMessages); } catch (_) {}
@@ -959,12 +1119,51 @@
 
     function saveState() {
       localStorage.setItem('quincy_dark_mode', String(state.darkMode));
+      localStorage.setItem('quincy_language', state.language);
       localStorage.setItem('quincy_guestbook_messages', JSON.stringify(state.messages));
     }
 
     function applyTheme() {
       document.documentElement.classList.toggle('dark', state.darkMode);
       document.querySelector('meta[name="theme-color"]').setAttribute('content', state.darkMode ? '#0a0a0a' : '#fafafa');
+    }
+
+    function applyLanguage() {
+      document.documentElement.lang = state.language === 'zh' ? 'zh-TW' : 'en';
+      document.title = t('pageTitle');
+      document.querySelector('meta[name="description"]').setAttribute('content', t('pageDescription'));
+      document.querySelector('meta[property="og:title"]').setAttribute('content', t('pageTitle'));
+
+      state.profileName = t('profileName');
+      state.profileLocation = t('profileLocation');
+      state.profileBio = t('profileBio');
+
+      document.querySelectorAll('[data-i18n]').forEach(element => {
+        const value = t(element.dataset.i18n);
+        element.textContent = value;
+        element.classList.toggle('hidden', value === '');
+      });
+      document.querySelectorAll('[data-i18n-html]').forEach(element => {
+        element.innerHTML = t(element.dataset.i18nHtml);
+      });
+
+      document.getElementById('guest-name').placeholder = t('guestNamePlaceholder');
+      document.getElementById('guest-message').placeholder = t('guestMessagePlaceholder');
+      document.getElementById('char-limit-suffix').textContent = t('charSuffix');
+      document.getElementById('theme-toggle-btn').setAttribute('aria-label', t('themeAria'));
+      document.getElementById('theme-toggle-btn').title = t('themeTitle');
+      document.getElementById('language-toggle-btn').setAttribute('aria-label', t('languageAria'));
+      document.getElementById('ace-web-pet').setAttribute('aria-label', t('petAria'));
+      document.getElementById('ace-web-pet').title = t('petTitle');
+      document.getElementById('line-close-btn').setAttribute('aria-label', t('close'));
+
+      document.querySelectorAll('.lang-choice').forEach(choice => {
+        choice.classList.toggle('is-active', choice.dataset.langChoice === state.language);
+      });
+
+      renderProfile();
+      renderGuestbook();
+      requestAnimationFrame(() => movePill(state.activeTab, false));
     }
 
     function renderProfile() {
@@ -1040,10 +1239,12 @@
 
     function renderGuestbook() {
       const container = document.getElementById('guestbook-messages');
-      document.getElementById('guestbook-count').textContent = `${state.messages.length} 則留言`;
+      document.getElementById('guestbook-count').textContent = state.language === 'zh'
+        ? `${state.messages.length} 則留言`
+        : `${state.messages.length} ${state.messages.length === 1 ? 'message' : 'messages'}`;
 
       if (!state.messages.length) {
-        container.innerHTML = '<div class="py-8 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm"><p>尚無留言。留下第一則祝福吧！</p></div>';
+        container.innerHTML = `<div class="py-8 text-center text-neutral-400 dark:text-neutral-500 font-sans text-sm"><p>${escapeHtml(t('noMessages'))}</p></div>`;
         return;
       }
 
@@ -1061,7 +1262,7 @@
               </div>
               <p class="font-sans text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed break-words">${escapeHtml(msg.message || '')}</p>
             </div>
-            ${canDelete ? `<button type="button" class="delete-message absolute top-3 right-3 p-1 rounded-md text-neutral-400 hover:text-red-500 transition-colors" data-id="${msg.id}" aria-label="刪除留言"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
+            ${canDelete ? `<button type="button" class="delete-message absolute top-3 right-3 p-1 rounded-md text-neutral-400 hover:text-red-500 transition-colors" data-id="${msg.id}" aria-label="${escapeHtml(t('deleteMessage'))}"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>` : ''}
           </div>`;
       }).join('');
 
@@ -1122,29 +1323,29 @@
 
       if (guestbookDB) {
         guestbookDB.ref('guestbook').push(newMessage)
-          .then(() => finish('留言成功送出！'))
-          .catch(() => showToast('送出失敗，請稍後再試。'));
+          .then(() => finish(t('sent')))
+          .catch(() => showToast(t('sendFailed')));
       } else {
         newMessage.id = String(Date.now());
         state.messages.unshift(newMessage);
         saveState();
         renderGuestbook();
-        finish('留言已儲存在此瀏覽器。');
+        finish(t('savedLocal'));
       }
     }
 
     function deleteMessage(id) {
       const msg = state.messages.find(item => item.id === id);
       if (!msg || msg.owner !== CLIENT_TOKEN) return;
-      if (!confirm('確定要刪除這則留言嗎？')) return;
+      if (!confirm(t('deleteConfirm'))) return;
 
       if (guestbookDB) {
-        guestbookDB.ref(`guestbook/${id}`).remove().then(() => showToast('留言已刪除。'));
+        guestbookDB.ref(`guestbook/${id}`).remove().then(() => showToast(t('deleted')));
       } else {
         state.messages = state.messages.filter(item => item.id !== id);
         saveState();
         renderGuestbook();
-        showToast('留言已刪除。');
+        showToast(t('deleted'));
       }
     }
 
@@ -1179,7 +1380,7 @@
     async function copyLineId() {
       try {
         await navigator.clipboard.writeText(state.lineId);
-        showToast('LINE ID 已複製');
+        showToast(t('copied'));
       } catch (_) {
         showToast(`LINE ID：${state.lineId}`);
       }
@@ -1571,13 +1772,19 @@
     document.addEventListener('DOMContentLoaded', () => {
       loadState();
       applyTheme();
-      renderProfile();
+      applyLanguage();
       initGuestbookSync();
       lucide.createIcons();
 
       document.getElementById('theme-toggle-btn').addEventListener('click', () => {
         state.darkMode = !state.darkMode;
         applyTheme();
+        saveState();
+      });
+
+      document.getElementById('language-toggle-btn').addEventListener('click', () => {
+        state.language = state.language === 'zh' ? 'en' : 'zh';
+        applyLanguage();
         saveState();
       });
 
