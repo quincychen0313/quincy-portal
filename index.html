@@ -48,6 +48,48 @@
     html { scroll-behavior: smooth; }
     body { min-height: 100vh; }
 
+    /* Marcello cinematic background */
+    #marcello-backdrop {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      overflow: hidden;
+      pointer-events: none;
+      background: #fafafa;
+      --seamless-video-opacity: .36;
+    }
+    .dark #marcello-backdrop {
+      background: #050505;
+      --seamless-video-opacity: .48;
+    }
+    #marcello-backdrop video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 900ms linear;
+      will-change: opacity;
+    }
+    #marcello-backdrop video.is-active { opacity: var(--seamless-video-opacity); }
+    .dark #marcello-backdrop video {
+      filter: invert(1) hue-rotate(180deg);
+    }
+    #marcello-backdrop::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse at center, transparent 18%, rgba(250,250,250,.62) 82%),
+        linear-gradient(to bottom, rgba(250,250,250,.34), rgba(250,250,250,.16) 42%, rgba(250,250,250,.5));
+    }
+    .dark #marcello-backdrop::after {
+      background:
+        radial-gradient(ellipse at center, transparent 18%, rgba(5,5,5,.68) 82%),
+        linear-gradient(to bottom, rgba(5,5,5,.45), rgba(5,5,5,.2) 42%, rgba(5,5,5,.58));
+    }
+
     .custom-scrollbar::-webkit-scrollbar { width: 4px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
     .custom-scrollbar::-webkit-scrollbar-thumb {
@@ -141,6 +183,7 @@
       transition: transform .16s ease-out;
       will-change: transform;
       position: relative;
+      isolation: isolate;
     }
     #logo-container::after {
       content: "";
@@ -152,12 +195,54 @@
       opacity: 0;
       transition: opacity .35s ease;
       pointer-events: none;
+      z-index: 1;
     }
     #logo-container:hover::after { opacity: 1; }
     #default-logo-img {
+      position: relative;
+      z-index: 2;
       transition: transform .35s cubic-bezier(.2,.8,.2,1), filter .35s ease;
     }
     #logo-container:hover #default-logo-img { transform: scale(1.035); }
+    .logo-video-layer {
+      position: absolute;
+      inset: 6%;
+      z-index: 0;
+      overflow: hidden;
+      border-radius: 50%;
+      background: #f5f5f5;
+      box-shadow: inset 0 0 0 1px rgba(17,24,39,.08), 0 18px 44px rgba(15,23,42,.12);
+      --seamless-video-opacity: .72;
+    }
+    .dark .logo-video-layer {
+      background: #050505;
+      box-shadow: inset 0 0 0 1px rgba(255,255,255,.12), 0 20px 48px rgba(0,0,0,.42);
+      --seamless-video-opacity: .82;
+    }
+    .logo-video-layer video {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0;
+      transition: opacity 900ms linear;
+      will-change: opacity;
+    }
+    .logo-video-layer video.is-active { opacity: var(--seamless-video-opacity); }
+    .dark .logo-video-layer video {
+      filter: invert(1) hue-rotate(180deg);
+    }
+    .logo-video-layer::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: radial-gradient(circle at center, transparent 34%, rgba(245,245,245,.52) 82%);
+      pointer-events: none;
+    }
+    .dark .logo-video-layer::after {
+      background: radial-gradient(circle at center, transparent 34%, rgba(5,5,5,.58) 82%);
+    }
 
     /* interactive cards */
     .interactive-card {
@@ -363,7 +448,7 @@
 
     #logo-container { transform-style:preserve-3d; }
     #logo-container::before {
-      content:""; position:absolute; inset:2%; border:1px solid rgba(148,163,184,.24); border-radius:50%;
+      content:""; position:absolute; inset:2%; z-index:1; border:1px solid rgba(148,163,184,.24); border-radius:50%;
       animation:logoOrbit 9s linear infinite; pointer-events:none;
     }
     #logo-container .orbit-dot { position:absolute; width:7px; height:7px; border-radius:50%; background:currentColor; color:#fff; box-shadow:0 0 18px currentColor; z-index:3; }
@@ -419,6 +504,14 @@
 <body class="min-h-screen bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 relative overflow-x-hidden flex flex-col">
   <div id="intro-gate" aria-hidden="true"><div class="intro-word">qVsion</div><div class="intro-line"></div></div>
   <div id="cursor-core" aria-hidden="true"></div><div id="cursor-ring" aria-hidden="true"></div><div id="trail-layer" aria-hidden="true"></div>
+  <div id="marcello-backdrop" aria-hidden="true">
+    <video class="seamless-video is-active" data-loop-slot="0" autoplay muted playsinline preload="auto">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260718_132657_c3ce20d7-d20a-4498-b552-6d966fe3720a.mp4" type="video/mp4">
+    </video>
+    <video class="seamless-video" data-loop-slot="1" muted playsinline preload="auto">
+      <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260718_132657_c3ce20d7-d20a-4498-b552-6d966fe3720a.mp4" type="video/mp4">
+    </video>
+  </div>
   <div class="fixed inset-0 bg-[linear-gradient(to_right,#8080800a_1px,transparent_1px),linear-gradient(to_bottom,#8080800a_1px,transparent_1px)] bg-[size:24px_24px] dark:bg-[linear-gradient(to_right,#ffffff05_1px,transparent_1px),linear-gradient(to_bottom,#ffffff05_1px,transparent_1px)] pointer-events-none z-0"></div>
   <div class="ambient-orb orb-a"></div>
   <div class="ambient-orb orb-b"></div>
@@ -464,7 +557,16 @@
             </div>
 
             <div class="my-4 md:my-0 flex flex-col items-center">
-              <div id="logo-container" class="w-52 h-52 md:w-64 md:h-64 flex items-center justify-center"><span class="orbit-dot dot-a"></span><span class="orbit-dot dot-b"></span>
+              <div id="logo-container" class="w-52 h-52 md:w-64 md:h-64 flex items-center justify-center">
+                <div class="logo-video-layer" aria-hidden="true">
+                  <video class="seamless-video is-active" data-loop-slot="0" autoplay muted playsinline preload="auto">
+                    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260718_132657_c3ce20d7-d20a-4498-b552-6d966fe3720a.mp4" type="video/mp4">
+                  </video>
+                  <video class="seamless-video" data-loop-slot="1" muted playsinline preload="auto">
+                    <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260718_132657_c3ce20d7-d20a-4498-b552-6d966fe3720a.mp4" type="video/mp4">
+                  </video>
+                </div>
+                <span class="orbit-dot dot-a"></span><span class="orbit-dot dot-b"></span>
                 <img id="default-logo-img" src="assets/qlogo.png" alt="Quincy Logo" class="w-full h-full object-contain invert dark:invert-0 select-none drop-shadow-sm">
               </div>
 
@@ -1070,6 +1172,101 @@
       });
     }
 
+    function initSeamlessVideoLoop() {
+      const slots = [0, 1].map(slot =>
+        Array.from(document.querySelectorAll(`.seamless-video[data-loop-slot="${slot}"]`))
+      );
+      const master = slots[0][0];
+      if (!master || !slots[1].length) return;
+
+      const crossfadeMs = 900;
+      const crossfadeSeconds = crossfadeMs / 1000;
+      let activeSlot = 0;
+      let isCrossfading = false;
+      let frameId = 0;
+      let fallbackTimer = 0;
+
+      const safelyPlay = video => {
+        const attempt = video.play();
+        if (attempt && typeof attempt.catch === 'function') attempt.catch(() => {});
+      };
+
+      const prepareSlot = (slot, time = 0) => {
+        slots[slot].forEach(video => {
+          video.currentTime = time;
+          safelyPlay(video);
+        });
+      };
+
+      const pauseSlot = slot => {
+        slots[slot].forEach(video => {
+          video.pause();
+          video.currentTime = 0;
+        });
+      };
+
+      const scheduleFallback = () => {
+        clearTimeout(fallbackTimer);
+        const current = slots[activeSlot][0];
+        if (!current || !Number.isFinite(current.duration)) return;
+        const delay = Math.max(80, (current.duration - current.currentTime - crossfadeSeconds) * 1000);
+        fallbackTimer = setTimeout(beginCrossfade, delay);
+      };
+
+      const beginCrossfade = () => {
+        if (isCrossfading) return;
+        isCrossfading = true;
+        const previousSlot = activeSlot;
+        const nextSlot = 1 - previousSlot;
+
+        prepareSlot(nextSlot, 0);
+        requestAnimationFrame(() => {
+          slots[nextSlot].forEach(video => video.classList.add('is-active'));
+          slots[previousSlot].forEach(video => video.classList.remove('is-active'));
+        });
+
+        setTimeout(() => {
+          pauseSlot(previousSlot);
+          activeSlot = nextSlot;
+          isCrossfading = false;
+          scheduleFallback();
+        }, crossfadeMs + 40);
+      };
+
+      const monitor = () => {
+        const current = slots[activeSlot][0];
+        if (!isCrossfading && current && Number.isFinite(current.duration) &&
+            current.duration - current.currentTime <= crossfadeSeconds) {
+          beginCrossfade();
+        }
+        frameId = requestAnimationFrame(monitor);
+      };
+
+      const start = () => {
+        slots.flat().forEach(video => video.pause());
+        slots[0].forEach(video => video.classList.add('is-active'));
+        slots[1].forEach(video => video.classList.remove('is-active'));
+        prepareSlot(0, 0);
+        scheduleFallback();
+        cancelAnimationFrame(frameId);
+        frameId = requestAnimationFrame(monitor);
+      };
+
+      if (master.readyState >= 1) start();
+      else master.addEventListener('loadedmetadata', start, { once: true });
+
+      document.addEventListener('visibilitychange', () => {
+        if (document.hidden) return;
+        const current = slots[activeSlot][0];
+        if (!current || current.ended || current.currentTime >= current.duration - .05) {
+          beginCrossfade();
+        } else {
+          slots[activeSlot].forEach(safelyPlay);
+          scheduleFallback();
+        }
+      });
+    }
+
 
 
     function initMaxMotion() {
@@ -1160,6 +1357,7 @@
 
       initPointerEffects();
       initInteractiveCards();
+      initSeamlessVideoLoop();
       initMaxMotion();
       requestAnimationFrame(() => {
         movePill('links', false);
