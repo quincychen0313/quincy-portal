@@ -478,20 +478,21 @@
     #theme-toggle-btn { transition:transform .28s cubic-bezier(.2,.8,.2,1), box-shadow .28s ease, border-color .3s, background-color .3s; }
 
     #ace-web-pet {
-      position:fixed;
-      right:max(14px,env(safe-area-inset-right));
-      bottom:max(14px,env(safe-area-inset-bottom));
-      z-index:35;
-      width:144px;
-      height:156px;
+      position:relative;
+      z-index:25;
+      width:106px;
+      height:115px;
+      margin:22px auto -8px;
       padding:0;
       border:0;
       background:transparent;
-      cursor:pointer;
+      cursor:grab;
       overflow:visible;
       filter:drop-shadow(0 18px 18px rgba(0,0,0,.24));
       transition:transform .3s cubic-bezier(.2,.8,.2,1),filter .3s ease;
       transform-origin:bottom center;
+      touch-action:none;
+      user-select:none;
       -webkit-tap-highlight-color:transparent;
     }
     #ace-web-pet:hover {
@@ -499,6 +500,13 @@
       filter:drop-shadow(0 22px 22px rgba(0,0,0,.3));
     }
     #ace-web-pet:active { transform:translateY(-1px) scale(.97); }
+    #ace-web-pet.is-detached { z-index:45; }
+    #ace-web-pet.is-dragging {
+      cursor:grabbing;
+      transform:none!important;
+      transition:none!important;
+      filter:drop-shadow(0 24px 24px rgba(0,0,0,.34));
+    }
     #ace-web-pet:focus-visible {
       outline:2px solid rgba(99,102,241,.9);
       outline-offset:5px;
@@ -512,7 +520,7 @@
       background-repeat:no-repeat;
       background-size:1536px 2288px;
       background-position:0 0;
-      transform:scale(.75);
+      transform:scale(.552);
       transform-origin:top left;
       pointer-events:none;
       user-select:none;
@@ -526,14 +534,13 @@
       #portal-board-wrap::before { opacity:.28; animation-duration:16s; }
       .interactive-card:hover { transform:none; }
     }
-    @media (max-width:640px) {
+    @media (min-width:768px) {
       #ace-web-pet {
-        right:max(7px,env(safe-area-inset-right));
-        bottom:max(9px,env(safe-area-inset-bottom));
-        width:106px;
-        height:115px;
+        position:absolute;
+        right:-53px;
+        bottom:110px;
+        margin:0;
       }
-      #ace-pet-sprite { transform:scale(.552); }
     }
     @media (prefers-reduced-motion:reduce) {
       #intro-gate { display:none!important; }
@@ -600,7 +607,7 @@
 
     <div id="portal-board-wrap" class="reveal" style="--delay:180ms">
       <div id="portal-board" class="w-full bg-white/90 dark:bg-neutral-900/60 border border-neutral-200/70 dark:border-neutral-800/80 rounded-3xl shadow-xl overflow-hidden grid grid-cols-1 md:grid-cols-12 backdrop-blur-xl">
-        <section class="md:col-span-5 bg-neutral-50/60 dark:bg-neutral-900/35 p-8 flex flex-col justify-between items-center text-center border-b md:border-b-0 md:border-r border-neutral-200/60 dark:border-neutral-800/80">
+        <section id="profile-panel" class="relative md:col-span-5 bg-neutral-50/60 dark:bg-neutral-900/35 p-8 flex flex-col justify-between items-center text-center border-b md:border-b-0 md:border-r border-neutral-200/60 dark:border-neutral-800/80">
           <div class="w-full flex flex-col items-center md:-mt-2">
             <div class="w-full text-left hidden md:block mb-6">
               <span class="font-mono text-[10px] text-neutral-400 tracking-widest block mb-1">qVsion</span>
@@ -651,6 +658,10 @@
               </a>
             </div>
           </div>
+
+          <button id="ace-web-pet" type="button" aria-label="拖曳 Ace 小偶，點一下可互動" title="拖曳移動；點一下互動；雙擊回到原位">
+            <span id="ace-pet-sprite" aria-hidden="true"></span>
+          </button>
         </section>
 
         <section class="md:col-span-7 p-6 sm:p-10 flex flex-col justify-between min-w-0">
@@ -858,10 +869,6 @@
       </div>
     </div>
   </main>
-
-  <button id="ace-web-pet" type="button" aria-label="讓 Ace 小偶打招呼" title="點我互動">
-    <span id="ace-pet-sprite" aria-hidden="true"></span>
-  </button>
 
   <div id="line-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm opacity-0 pointer-events-none transition-all duration-300">
     <div id="line-modal-card" class="relative w-full max-w-sm bg-white dark:bg-neutral-900 rounded-3xl p-6 shadow-2xl border border-neutral-100 dark:border-neutral-800 text-center scale-95 transition-all duration-300">
@@ -1333,6 +1340,12 @@
         jumping: { row:4, durations:[140,140,140,140,280], loop:false }
       };
       let timer = 0;
+      let dragState = null;
+      let didDrag = false;
+      let suppressClick = false;
+      const positionKey = 'quincy_ace_pet_position';
+      const homeParent = pet.parentNode;
+      const homeNextSibling = pet.nextSibling;
 
       const showFrame = (row, frame) => {
         sprite.style.backgroundPosition = `${-frame * 192}px ${-row * 208}px`;
@@ -1359,13 +1372,136 @@
         advance();
       };
 
+      const clamp = (value, min, max) => Math.min(Math.max(value, min), Math.max(min, max));
+
+      const placeFixed = (left, top) => {
+        if (pet.parentNode !== document.body) {
+          document.body.appendChild(pet);
+          if (dragState) {
+            try { pet.setPointerCapture(dragState.pointerId); } catch (_) {}
+          }
+        }
+        const width = pet.offsetWidth;
+        const height = pet.offsetHeight;
+        pet.classList.add('is-detached');
+        pet.style.position = 'fixed';
+        pet.style.right = 'auto';
+        pet.style.bottom = 'auto';
+        pet.style.margin = '0';
+        pet.style.left = `${clamp(left, 6, innerWidth - width - 6)}px`;
+        pet.style.top = `${clamp(top, 6, innerHeight - height - 6)}px`;
+      };
+
+      const savePosition = () => {
+        if (!pet.classList.contains('is-detached')) return;
+        const rect = pet.getBoundingClientRect();
+        const maxX = Math.max(1, innerWidth - rect.width);
+        const maxY = Math.max(1, innerHeight - rect.height);
+        try {
+          localStorage.setItem(positionKey, JSON.stringify({
+            x: clamp(rect.left / maxX, 0, 1),
+            y: clamp(rect.top / maxY, 0, 1)
+          }));
+        } catch (_) {}
+      };
+
+      const resetPosition = () => {
+        localStorage.removeItem(positionKey);
+        pet.classList.remove('is-detached','is-dragging');
+        ['position','left','top','right','bottom','margin'].forEach(property => {
+          pet.style.removeProperty(property);
+        });
+        if (homeNextSibling && homeNextSibling.parentNode === homeParent) {
+          homeParent.insertBefore(pet, homeNextSibling);
+        } else {
+          homeParent.appendChild(pet);
+        }
+      };
+
+      const restorePosition = () => {
+        try {
+          const saved = JSON.parse(localStorage.getItem(positionKey));
+          if (!saved || !Number.isFinite(saved.x) || !Number.isFinite(saved.y)) return;
+          const maxX = Math.max(1, innerWidth - pet.offsetWidth);
+          const maxY = Math.max(1, innerHeight - pet.offsetHeight);
+          placeFixed(saved.x * maxX, saved.y * maxY);
+        } catch (_) {
+          localStorage.removeItem(positionKey);
+        }
+      };
+
+      const endDrag = event => {
+        if (!dragState || event.pointerId !== dragState.pointerId) return;
+        if (pet.hasPointerCapture(event.pointerId)) pet.releasePointerCapture(event.pointerId);
+        pet.classList.remove('is-dragging');
+        if (didDrag) {
+          savePosition();
+          suppressClick = true;
+          setTimeout(() => { suppressClick = false; }, 0);
+        }
+        dragState = null;
+      };
+
+      pet.addEventListener('pointerdown', event => {
+        if (event.pointerType === 'mouse' && event.button !== 0) return;
+        const rect = pet.getBoundingClientRect();
+        dragState = {
+          pointerId: event.pointerId,
+          startX: event.clientX,
+          startY: event.clientY,
+          offsetX: event.clientX - rect.left,
+          offsetY: event.clientY - rect.top
+        };
+        didDrag = false;
+        pet.setPointerCapture(event.pointerId);
+      });
+
+      pet.addEventListener('pointermove', event => {
+        if (!dragState || event.pointerId !== dragState.pointerId) return;
+        if (!didDrag && Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) < 5) return;
+        didDrag = true;
+        pet.classList.add('is-dragging');
+        placeFixed(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
+      });
+
+      pet.addEventListener('pointerup', endDrag);
+      pet.addEventListener('pointercancel', endDrag);
+      pet.addEventListener('dblclick', event => {
+        event.preventDefault();
+        resetPosition();
+        play('waving');
+      });
+
+      pet.addEventListener('keydown', event => {
+        const movement = { ArrowLeft:[-12,0], ArrowRight:[12,0], ArrowUp:[0,-12], ArrowDown:[0,12] }[event.key];
+        if (!movement) return;
+        event.preventDefault();
+        const rect = pet.getBoundingClientRect();
+        placeFixed(rect.left + movement[0], rect.top + movement[1]);
+        savePosition();
+      });
+
+      window.addEventListener('resize', () => {
+        if (!pet.classList.contains('is-detached')) return;
+        const rect = pet.getBoundingClientRect();
+        placeFixed(rect.left, rect.top);
+        savePosition();
+      });
+
+      restorePosition();
       if (matchMedia('(prefers-reduced-motion:reduce)').matches) {
         showFrame(0, 0);
         return;
       }
 
       pet.addEventListener('pointerenter', () => play('waving'));
-      pet.addEventListener('click', () => play('jumping'));
+      pet.addEventListener('click', event => {
+        if (suppressClick || didDrag) {
+          event.preventDefault();
+          return;
+        }
+        play('jumping');
+      });
       play('idle');
     }
 
