@@ -1544,10 +1544,14 @@
 
       const animations = {
         idle: { row:0, durations:[280,110,110,140,140,320], loop:true },
+        runningRight: { row:1, durations:[92,92,92,92,92,92,92,92], loop:true },
+        runningLeft: { row:2, durations:[92,92,92,92,92,92,92,92], loop:true },
         waving: { row:3, durations:[140,140,140,280], loop:false },
         jumping: { row:4, durations:[140,140,140,140,280], loop:false }
       };
       let timer = 0;
+      let movementStopTimer = 0;
+      let currentAnimation = '';
       let dragState = null;
       let didDrag = false;
       let suppressClick = false;
@@ -1559,7 +1563,9 @@
         sprite.style.backgroundPosition = `${-frame * 192}px ${-row * 208}px`;
       };
 
-      const play = name => {
+      const play = (name, restart = false) => {
+        if (!restart && currentAnimation === name) return;
+        currentAnimation = name;
         clearTimeout(timer);
         const animation = animations[name];
         let frame = 0;
@@ -1644,6 +1650,7 @@
         pet.classList.remove('is-dragging');
         if (didDrag) {
           savePosition();
+          play('idle');
           suppressClick = true;
           setTimeout(() => { suppressClick = false; }, 0);
         }
@@ -1658,8 +1665,10 @@
           startX: event.clientX,
           startY: event.clientY,
           offsetX: event.clientX - rect.left,
-          offsetY: event.clientY - rect.top
+          offsetY: event.clientY - rect.top,
+          lastX: event.clientX
         };
+        clearTimeout(movementStopTimer);
         didDrag = false;
         pet.setPointerCapture(event.pointerId);
       });
@@ -1669,6 +1678,11 @@
         if (!didDrag && Math.hypot(event.clientX - dragState.startX, event.clientY - dragState.startY) < 5) return;
         didDrag = true;
         pet.classList.add('is-dragging');
+        const horizontalDelta = event.clientX - dragState.lastX;
+        if (Math.abs(horizontalDelta) >= .5) {
+          play(horizontalDelta < 0 ? 'runningLeft' : 'runningRight');
+        }
+        dragState.lastX = event.clientX;
         placeFixed(event.clientX - dragState.offsetX, event.clientY - dragState.offsetY);
       });
 
@@ -1677,7 +1691,7 @@
       pet.addEventListener('dblclick', event => {
         event.preventDefault();
         resetPosition();
-        play('waving');
+        play('waving', true);
       });
 
       pet.addEventListener('keydown', event => {
@@ -1687,6 +1701,10 @@
         const rect = pet.getBoundingClientRect();
         placeFixed(rect.left + movement[0], rect.top + movement[1]);
         savePosition();
+        if (event.key === 'ArrowLeft') play('runningLeft');
+        else if (event.key === 'ArrowRight') play('runningRight');
+        clearTimeout(movementStopTimer);
+        movementStopTimer = setTimeout(() => play('idle'), 420);
       });
 
       window.addEventListener('resize', () => {
@@ -1702,13 +1720,13 @@
         return;
       }
 
-      pet.addEventListener('pointerenter', () => play('waving'));
+      pet.addEventListener('pointerenter', () => play('waving', true));
       pet.addEventListener('click', event => {
         if (suppressClick || didDrag) {
           event.preventDefault();
           return;
         }
-        play('jumping');
+        play('jumping', true);
       });
       play('idle');
     }
