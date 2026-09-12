@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="description" content="Quincy Portal animation comparison page" />
+  <meta name="description" content="Quincy Portal 六個歷史版本比較，從無動畫到最新可互動的 3D Logo。" />
   <title>Quincy Portal — Motion Compare</title>
 
   <link rel="icon" href="favicon.ico" sizes="any" />
@@ -148,7 +148,7 @@
 
     .compare-grid {
       display:grid;
-      grid-template-columns:repeat(5,minmax(0,1fr));
+      grid-template-columns:repeat(3,minmax(0,1fr));
       gap:18px;
       margin-top:42px;
     }
@@ -186,6 +186,10 @@
     }
 
     .card:hover::before { opacity:1; }
+
+    .card-latest { border-color:rgba(255,255,255,.28); }
+    .card-latest .badge { background:#f5f5f5; color:#101010; }
+    .card a:focus-visible { outline:2px solid #fff; outline-offset:-5px; border-radius:26px; }
 
     .card:hover {
       border-color:rgba(255,255,255,.2);
@@ -335,6 +339,7 @@
     .card:nth-child(3){animation-delay:.2s;}
     .card:nth-child(4){animation-delay:.26s;}
     .card:nth-child(5){animation-delay:.32s;}
+    .card:nth-child(6){animation-delay:.38s;}
 
     @keyframes intro {
       from { opacity:0; transform:translateY(20px); filter:blur(10px); }
@@ -392,7 +397,7 @@
       <div class="eyebrow">Motion Design Comparison</div>
       <h1>Same design.<br>Different motion.</h1>
       <p>
-        用同一個 Quincy Portal，比較「沒有動畫、基本動畫、進階互動、動態背景、最終版本」之間，
+        用同一個 Quincy Portal，比較「沒有動畫、基本動畫、進階互動、動態背景、原最終版、最新 3D 版」之間，
         如何影響視覺層級、回饋感、品牌個性與使用體驗。
       </p>
     </section>
@@ -470,13 +475,13 @@
       </article>
 
       <article class="card">
-        <a href="index.html">
+        <a href="index-final.html">
           <div class="card-top">
             <span class="number">05 / FINAL</span>
-            <span class="badge">Final</span>
+            <span class="badge">Final / 2D</span>
           </div>
           <h2>Final</h2>
-          <p>最終版本。整合完整互動、無縫動態背景、Logo 動畫層，以及可自由拖曳並保留位置的 Ace 小偶。</p>
+          <p>保留原本的最終版本。整合完整互動、無縫動態背景、平面 Logo 動畫層，以及可自由拖曳並保留位置的 Ace 小偶。</p>
           <div class="features">
             <span class="feature">Full experience</span>
             <span class="feature">Animated background</span>
@@ -484,6 +489,24 @@
             <span class="feature">Position memory</span>
           </div>
           <span class="arrow">↗</span>
+        </a>
+      </article>
+
+      <article class="card card-latest">
+        <a href="index.html" aria-label="開啟最新 3D Logo 版本">
+          <div class="card-top">
+            <span class="number">06 / 3D LOGO</span>
+            <span class="badge">Latest / 最新</span>
+          </div>
+          <h2>3D Logo</h2>
+          <p>最新版本。首頁 Logo 換成具有實體厚度的 3D 模型，可拖曳 360° 旋轉。預設保持靜止，按播放才開始自動旋轉，材質隨深淺色模式切換。</p>
+          <div class="features">
+            <span class="feature">3D model</span>
+            <span class="feature">Drag to rotate</span>
+            <span class="feature">Starts still</span>
+            <span class="feature">Light / Dark</span>
+          </div>
+          <span class="arrow" aria-hidden="true">↗</span>
         </a>
       </article>
     </section>
